@@ -1,0 +1,23 @@
+{
+  "name": "nostr-mcp",
+  "version": "0.1.0",
+  "exports": "./src/mod.ts",
+  "tasks": {
+    "mcp": "deno run --allow-net --allow-run --allow-read --allow-env src/mod.ts",
+    "test": "deno test --allow-net",
+    "check": "deno check src/mod.ts",
+    "lint": "deno lint"
+  },
+  "imports": {
+    "@glama/fastmcp": "jsr:@glama/fastmcp@1.21.0",
+    "zod": "npm:zod@^3.24.2"
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 80,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve"
+  }
+}

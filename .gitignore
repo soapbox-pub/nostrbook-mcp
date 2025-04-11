@@ -1,0 +1,9 @@
+# Deno specific
+.env
+.DS_Store
+*.orig
+*.pyc
+*.swp
+
+# Runtime data directories
+.nostr-mcp/

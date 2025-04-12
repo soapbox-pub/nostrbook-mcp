@@ -55,4 +55,23 @@ Deno.test('NostrMcpServer', async (t) => {
 
     assertEquals(result, { content: [{ type: 'text', text: 'NIP-01' }] });
   });
+
+  await t.step('tools/call (read_kind 404)', async () => {
+    const result = await client.request(
+      {
+        method: 'tools/call',
+        params: { name: 'read_kind', arguments: { kind: 31890 } },
+      },
+      CallToolResultSchema,
+    );
+
+    assertEquals(result, {
+      content: [{
+        type: 'text',
+        text:
+          'No documentation found for kind 31890. Try using the `read_nips_index` tool to find the correct NIP.',
+      }],
+      isError: true,
+    });
+  });
 });

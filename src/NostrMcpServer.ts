@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 
+import { HTTPError } from './HTTPError.ts';
 import { NIPsClient } from './NIPsClient.ts';
 import { NostrbookClient } from './NostrbookClient.ts';
 
@@ -43,9 +44,24 @@ export class NostrMcpServer extends McpServer {
           )
           .describe('NIP to retrieve, e.g. `01` or `C7`'),
       },
-      async ({ nip }) => ({
-        content: [{ type: 'text', text: await this.nips.readNip(nip) }],
-      }),
+      async ({ nip }) => {
+        try {
+          const text = await this.nips.readNip(nip);
+          return { content: [{ type: 'text', text }] };
+        } catch (error) {
+          if (error instanceof HTTPError && error.response.status === 404) {
+            return {
+              content: [{
+                type: 'text',
+                text:
+                  `NIP-${nip} does not exist in the official NIPs repository. Try using the \`read_nips_index\` tool to retrieve the full list of NIPs.`,
+              }],
+              isError: true,
+            };
+          }
+          throw error;
+        }
+      },
     );
 
     this.tool(
@@ -54,9 +70,24 @@ export class NostrMcpServer extends McpServer {
       {
         kind: z.number().describe('Kind number to retrieve, e.g. `1` or `42`'),
       },
-      async ({ kind }) => ({
-        content: [{ type: 'text', text: await this.nostrbook.readKind(kind) }],
-      }),
+      async ({ kind }) => {
+        try {
+          const text = await this.nostrbook.readKind(kind);
+          return { content: [{ type: 'text', text }] };
+        } catch (error) {
+          if (error instanceof HTTPError && error.response.status === 404) {
+            return {
+              content: [{
+                type: 'text',
+                text:
+                  `No documentation found for kind ${kind}. Try using the \`read_nips_index\` tool to see if it's specified by a NIP.`,
+              }],
+              isError: true,
+            };
+          }
+          throw error;
+        }
+      },
     );
 
     this.tool(
@@ -65,9 +96,24 @@ export class NostrMcpServer extends McpServer {
       {
         tag: z.string().describe('Tag name to retrieve, e.g. `p` or `e`'),
       },
-      async ({ tag }) => ({
-        content: [{ type: 'text', text: await this.nostrbook.readTag(tag) }],
-      }),
+      async ({ tag }) => {
+        try {
+          const text = await this.nostrbook.readTag(tag);
+          return { content: [{ type: 'text', text }] };
+        } catch (error) {
+          if (error instanceof HTTPError && error.response.status === 404) {
+            return {
+              content: [{
+                type: 'text',
+                text:
+                  `No documentation found for the "${tag}" tag. Try using the \`read_nips_index\` tool to see if it's specified by a NIP.`,
+              }],
+              isError: true,
+            };
+          }
+          throw error;
+        }
+      },
     );
 
     this.tool(

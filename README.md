@@ -44,7 +44,9 @@ Read a specific NIP's documentation:
 ```typescript
 {
   name: "read_nip",
-  parameters: "01" // 2-digit hex string NIP identifier
+  parameters: {
+    nip: "01" // 2-digit hex string NIP identifier
+  }
 }
 ```
 
@@ -61,7 +63,9 @@ Read documentation about a specific event kind:
 ```typescript
 {
   name: "read_kind",
-  parameters: 1 // Kind number
+  parameters: {
+    kind: 1 // Kind number
+  }
 }
 ```
 
@@ -78,7 +82,9 @@ Read documentation about a specific Nostr tag:
 ```typescript
 {
   name: "read_tag",
-  parameters: "e" // Tag name
+  parameters: {
+    tag: "e" // Tag name
+  }
 }
 ```
 
@@ -95,7 +101,9 @@ Read general protocol documentation:
 ```typescript
 {
   name: "read_protocol",
-  parameters: "index" // One of: "index", "event", "filter", "client", "relay"
+  parameters: {
+    doc: "index" // One of: "index", "event", "filter", "client", "relay"
+  }
 }
 ```
 
@@ -111,7 +119,8 @@ Read the NIPs index which lists all NIPs:
 
 ```typescript
 {
-  name: 'read_nips_index';
+  name: 'read_nips_index',
+  parameters: {} // No parameters required
 }
 ```
 

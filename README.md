@@ -147,6 +147,9 @@ List all NIPs in the Nostr protocol
 ## Development
 
 ```bash
+# Launch the MCP inspector
+deno task dev
+
 # Run the MCP server
 deno task start
 
@@ -159,6 +162,14 @@ deno task check
 # Lint code
 deno task lint
 ```
+
+To test local changes with Goose, use:
+
+```bash
+goose session --with-extension="deno task --cwd /path/to/nostr-mcp start"
+```
+
+(replace `/path/to/nostr-mcp` with the absolute path to this repo)
 
 ## Architecture
 

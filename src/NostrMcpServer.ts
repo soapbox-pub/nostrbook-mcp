@@ -5,6 +5,7 @@ import { NIPsClient } from './NIPsClient.ts';
 import { NostrbookClient } from './NostrbookClient.ts';
 
 interface NostrMcpServerOpts {
+  fetch?: typeof fetch;
   nostrbookBaseUrl?: string;
   nipsUrlTemplate?: string;
 }
@@ -15,6 +16,7 @@ export class NostrMcpServer extends McpServer {
 
   constructor(opts: NostrMcpServerOpts = {}) {
     const {
+      fetch = globalThis.fetch,
       nostrbookBaseUrl = 'https://nostrbook.dev',
       nipsUrlTemplate =
         'https://raw.githubusercontent.com/nostr-protocol/nips/refs/heads/master/{nip}.md',
@@ -25,8 +27,8 @@ export class NostrMcpServer extends McpServer {
       version: '0.1.0',
     });
 
-    this.nostrbook = new NostrbookClient({ baseUrl: nostrbookBaseUrl });
-    this.nips = new NIPsClient({ urlTemplate: nipsUrlTemplate });
+    this.nostrbook = new NostrbookClient({ fetch, baseUrl: nostrbookBaseUrl });
+    this.nips = new NIPsClient({ fetch, urlTemplate: nipsUrlTemplate });
 
     this.tool(
       'read_nip',

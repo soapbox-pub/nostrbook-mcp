@@ -1,9 +1,22 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@std/assert@^1.0.12": "1.0.12",
+    "jsr:@std/internal@^1.0.6": "1.0.6",
     "npm:@modelcontextprotocol/inspector@*": "0.8.2",
     "npm:@modelcontextprotocol/sdk@^1.9.0": "1.9.0_express@5.1.0_zod@3.24.2",
     "npm:zod@^3.24.2": "3.24.2"
+  },
+  "jsr": {
+    "@std/assert@1.0.12": {
+      "integrity": "08009f0926dda9cbd8bef3a35d3b6a4b964b0ab5c3e140a4e0351fbf34af5b9a",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.6": {
+      "integrity": "9533b128f230f73bd209408bb07a4b12f8d4255ab2a4d22a1fd6d87304aca9a4"
+    }
   },
   "npm": {
     "@cspotcode/source-map-support@0.8.1": {

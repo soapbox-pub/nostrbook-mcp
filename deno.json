@@ -7,7 +7,7 @@
   "tasks": {
     "start": "deno run -A src/stdio.ts",
     "dev": "deno run -A --node-modules-dir npm:@modelcontextprotocol/inspector deno task start",
-    "test": "deno test",
+    "test": "deno test -A",
     "check": "deno check .",
     "lint": "deno lint"
   },

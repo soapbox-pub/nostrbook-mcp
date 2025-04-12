@@ -37,7 +37,7 @@ export class NostrbookClient {
     return this.get(`/tags/${tag}`);
   }
 
-  readProtocol(slug: string): Promise<string> {
-    return this.get(`/protocol/${slug}`);
+  readProtocol(doc: string): Promise<string> {
+    return this.get(`/protocol/${doc}`);
   }
 }

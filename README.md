@@ -1,4 +1,4 @@
-# nostr-mcp
+# Nostr MCP
 
 _Illuminating the decentralized web, one document at a time._ 🌟 🔑 📚 ⚡️
 

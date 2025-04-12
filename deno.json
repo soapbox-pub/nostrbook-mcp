@@ -1,7 +1,9 @@
 {
   "name": "nostr-mcp",
   "version": "0.1.0",
-  "exports": "./src/server.ts",
+  "exports": {
+    ".": "./src/server.ts"
+  },
   "tasks": {
     "start": "deno run -A src/server.ts",
     "test": "deno test",

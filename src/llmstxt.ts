@@ -5,14 +5,14 @@
 export function llmstxtUrl(url: URL | string): URL {
   url = new URL(url);
 
-  if (url.pathname.endsWith(".md")) {
+  if (url.pathname.endsWith('.md')) {
     return url;
   }
 
-  if (url.pathname.endsWith("/")) {
-    url.pathname += "index.md";
+  if (url.pathname.endsWith('/')) {
+    url.pathname += 'index.md';
   } else {
-    url.pathname += ".md";
+    url.pathname += '.md';
   }
 
   return url;

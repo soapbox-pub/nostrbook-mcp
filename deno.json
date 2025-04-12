@@ -14,11 +14,8 @@
     "zod": "npm:zod@^3.24.2"
   },
   "fmt": {
-    "useTabs": false,
     "lineWidth": 80,
-    "indentWidth": 2,
-    "semiColons": true,
-    "singleQuote": false,
+    "singleQuote": true,
     "proseWrap": "preserve"
   }
 }

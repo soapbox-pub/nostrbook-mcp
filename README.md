@@ -39,12 +39,12 @@ If you're using [Goose](https://block.github.io/goose/), you can try this MCP in
 goose session --with-extension="deno run -A jsr:@nostrbook/mcp"
 ```
 
-To install it permanently:
+To install it in Goose permanently:
 
 1. Run `goose configure`
 2. Choose "Add Extension"
 3. Choose "Command-line Extension"
-4. Call it "nostr"
+4. Enter "nostr" as the name
 5. Enter `deno run -A jsr:@nostrbook/mcp` as the command
 
 ### Available Tools

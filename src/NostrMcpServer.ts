@@ -15,17 +15,17 @@ export class NostrMcpServer extends McpServer {
   private nips: NIPsClient;
 
   constructor(opts: NostrMcpServerOpts = {}) {
+    super({
+      name: 'nostr',
+      version: '0.2.0',
+    });
+
     const {
       fetch = globalThis.fetch,
       nostrbookBaseUrl = 'https://nostrbook.dev',
       nipsUrlTemplate =
         'https://raw.githubusercontent.com/nostr-protocol/nips/refs/heads/master/{nip}.md',
     } = opts;
-
-    super({
-      name: 'nostr',
-      version: '0.1.0',
-    });
 
     this.nostrbook = new NostrbookClient({ fetch, baseUrl: nostrbookBaseUrl });
     this.nips = new NIPsClient({ fetch, urlTemplate: nipsUrlTemplate });

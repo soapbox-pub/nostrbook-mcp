@@ -1,0 +1,24 @@
+image: denoland/deno:2.2.9
+
+default:
+  interruptible: true
+
+stages:
+  - test
+
+test:
+  stage: test
+  timeout: 2 minutes
+  script:
+    - deno fmt --check
+    - deno task lint
+    - deno task check
+    - deno task test --coverage=cov_profile
+    - deno coverage cov_profile
+  coverage: /All files[^\|]*\|[^\|]*\s+([\d\.]+)/
+  artifacts:
+    when: always
+    paths:
+      - deno-test.xml
+    reports:
+      junit: deno-test.xml

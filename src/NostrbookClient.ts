@@ -1,14 +1,20 @@
 import { HTTPError } from './HTTPError.ts';
 import { llmstxtUrl } from './llmstxt.ts';
 
+/** Options for configuring the NostrbookClient */
 export interface NostrbookClientOpts {
+  /** Base URL of the Nostrbook service */
   baseUrl: URL | string;
+  /** Optional fetch function override */
   fetch?: typeof fetch;
 }
 
+/** Client for interacting with Nostrbook documentation */
 export class NostrbookClient {
+  /** Base URL of the Nostrbook service */
   readonly baseUrl: URL;
 
+  /** The fetch implementation to use for requests */
   private fetch: typeof fetch;
 
   constructor(opts: NostrbookClientOpts) {
@@ -16,6 +22,7 @@ export class NostrbookClient {
     this.fetch = opts.fetch ?? globalThis.fetch;
   }
 
+  /** Fetches content from a specific path on the Nostrbook service */
   async get(path: string): Promise<string> {
     const url = llmstxtUrl(new URL(path, this.baseUrl));
 
@@ -29,14 +36,17 @@ export class NostrbookClient {
     return response.text();
   }
 
+  /** Reads documentation for a specific Nostr event kind */
   readKind(kind: number): Promise<string> {
     return this.get(`/kinds/${kind}`);
   }
 
+  /** Reads documentation for a specific Nostr tag */
   readTag(tag: string): Promise<string> {
     return this.get(`/tags/${tag}`);
   }
 
+  /** Reads documentation for a specific Nostr protocol document */
   readProtocol(doc: string): Promise<string> {
     return this.get(`/protocol/${doc}`);
   }

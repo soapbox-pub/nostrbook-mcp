@@ -164,8 +164,8 @@ deno task lint
 
 Nostr MCP is built with:
 
-- [Deno](https://deno.land) - The JavaScript/TypeScript runtime
-- [FastMCP](https://jsr.io/@glama/fastmcp) - Framework for building MCPs
+- [Deno](https://deno.com) - The JavaScript/TypeScript runtime
+- [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk) - SDK for building MCPs
 - [Zod](https://zod.dev) - TypeScript-first schema validation
 - HTTP client for fetching documentation from:
   - [Nostr NIPs GitHub repository](https://github.com/nostr-protocol/nips)

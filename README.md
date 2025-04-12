@@ -2,158 +2,164 @@
 
 _Illuminating the decentralized web, one document at a time._ 🌟 🔑 📚 ⚡️
 
-A Model Context Protocol (MCP) implementation that provides access to Nostr protocol documentation using nostrbook's tooling.
+A Model Context Protocol (MCP) implementation that provides AI assistants with access to Nostr protocol documentation.
 
 ## Overview
 
-This MCP provides tools to read and search through Nostr Implementation Possibilities (NIPs), tags, kinds, and protocol documentation by integrating with [nostrbook](https://gitlab.com/soapbox-pub/nostrbook).
+Nostr MCP is an extension for AI assistants that allows them to access up-to-date information about the Nostr protocol, including:
 
-## Installation
+- NIPs (Nostr Implementation Possibilities) directly from the official GitHub repository
+- Event kinds documentation from Nostrbook
+- Tag documentation from Nostrbook
+- General protocol documentation from Nostrbook
 
-```bash
-# Clone the repository with submodules
-git clone --recursive git@gitlab.com:soapbox-pub/nostr-mcp.git
+This enables AI assistants to provide accurate and current information about Nostr without relying on their training data, which may be outdated.
 
-# Or if already cloned
-git submodule update --init
-```
+## Features
+
+- **Read NIPs**: Access any NIP document directly from the official Nostr NIPs repository
+- **Read Event Kinds**: Get information about specific Nostr event kinds
+- **Read Tags**: Retrieve documentation on Nostr tags like `e`, `p`, etc.
+- **Protocol Documentation**: Access general Nostr protocol documentation
+- **NIPs Index**: View a complete list of all NIPs
 
 ## Usage
 
-Use with Goose:
+### With Goose
+
+If you're using [Goose](https://block.github.io/goose/), you can load this MCP as an extension:
 
 ```bash
-goose session --with-extension="deno task mcp"
+goose session --with-extension="deno run -A jsr:@nostrbook/mcp"
 ```
 
-The MCP provides the following tools:
+### Available Tools
 
-### read_nip
+The MCP provides the following tools to AI assistants:
 
-Read a specific NIP's documentation.
+#### read_nip
 
-```json
+Read a specific NIP's documentation:
+
+```typescript
 {
-  "name": "read_nip",
-  "parameters": {
-    "number": 1 // NIP number to retrieve
-  }
+  name: "read_nip",
+  parameters: "01" // 2-digit hex string NIP identifier
 }
 ```
 
-Example:
+Example usage in conversation:
 
-```bash
-# Get information about NIP-01
-tell me about nip-01
+```
+Tell me about NIP-01
 ```
 
-### read_tag
+#### read_kind
 
-Read documentation about a specific Nostr tag.
+Read documentation about a specific event kind:
 
-```json
+```typescript
 {
-  "name": "read_tag",
-  "parameters": {
-    "name": "e" // Tag name to retrieve
-  }
+  name: "read_kind",
+  parameters: 1 // Kind number
 }
 ```
 
-Example:
+Example usage in conversation:
 
-```bash
-# Get information about the 'e' tag
-what is the e tag used for?
+```
+Explain Nostr event kind 1
 ```
 
-### read_kind
+#### read_tag
 
-Read documentation about a specific event kind.
+Read documentation about a specific Nostr tag:
 
-```json
+```typescript
 {
-  "name": "read_kind",
-  "parameters": {
-    "number": 1 // Kind number to retrieve
-  }
+  name: "read_tag",
+  parameters: "e" // Tag name
 }
 ```
 
-Example:
+Example usage in conversation:
 
-```bash
-# Get information about kind 1 events
-tell me about kind 1 events
+```
+What is the 'e' tag used for in Nostr?
 ```
 
-### read_protocol
+#### read_protocol
 
-Read general protocol documentation.
+Read general protocol documentation:
 
-```json
+```typescript
 {
-  "name": "read_protocol",
-  "parameters": {}
+  name: "read_protocol",
+  parameters: "index" // One of: "index", "event", "filter", "client", "relay"
 }
 ```
 
-Example:
+Example usage in conversation:
 
-```bash
-# Get general protocol information
-how does the nostr protocol work?
+```
+How does the Nostr protocol work?
 ```
 
-### read_nips_index
+#### read_nips_index
 
-Read the NIPs index which lists all NIPs.
+Read the NIPs index which lists all NIPs:
 
-```json
+```typescript
 {
-  "name": "read_nips_index",
-  "parameters": {}
+  name: 'read_nips_index';
 }
 ```
 
-Example:
+Example usage in conversation:
 
-```bash
-# Get a list of all NIPs
-list all nips
+```
+List all NIPs in the Nostr protocol
 ```
 
 ## Development
 
 ```bash
-# Run the MCP
-deno task mcp
+# Run the MCP server
+deno task start
 
 # Run tests
 deno task test
 
-# Check types
+# Type check
 deno task check
 
-# Run linter
+# Lint code
 deno task lint
 ```
 
-## Dependencies
+## Architecture
 
-- [@glama/fastmcp](https://jsr.io/@glama/fastmcp) - MCP implementation
-- [zod](https://www.npmjs.com/package/zod) - Runtime type checking
-- [nostrbook](https://gitlab.com/soapbox-pub/nostrbook) - Source of Nostr documentation
+Nostr MCP is built with:
+
+- [Deno](https://deno.land) - The JavaScript/TypeScript runtime
+- [FastMCP](https://jsr.io/@glama/fastmcp) - Framework for building MCPs
+- [Zod](https://zod.dev) - TypeScript-first schema validation
+- HTTP client for fetching documentation from:
+  - [Nostr NIPs GitHub repository](https://github.com/nostr-protocol/nips)
+  - [Nostrbook](https://nostrbook.dev) documentation service
 
 ## Contributing
 
+Contributions are welcome! Here's how you can contribute:
+
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests to ensure everything works (`deno task test`)
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to your branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## License
 
-[GNU General Public License v3.0](./LICENSE.md)
+[GNU General Public License v3.0](./LICENSE)

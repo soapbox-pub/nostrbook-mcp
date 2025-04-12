@@ -1,5 +1,5 @@
 {
-  "name": "nostr-mcp",
+  "name": "@nostrbook/mcp",
   "version": "0.1.0",
   "exports": {
     ".": "./src/server.ts"

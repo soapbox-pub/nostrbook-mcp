@@ -2,7 +2,10 @@ import { FastMCP } from "@glama/fastmcp";
 import { z } from "zod";
 
 // Execute a nostrbook task and capture stdout
-async function execNostrbook(taskName: string, ...args: string[]): Promise<string> {
+async function execNostrbook(
+  taskName: string,
+  ...args: string[]
+): Promise<string> {
   const cmd = new Deno.Command("deno", {
     args: ["task", taskName, ...args],
     cwd: "./nostrbook",
@@ -38,40 +41,54 @@ server.addTool({
   execute: async (args) => {
     const nipNumber = args.number.toString().padStart(2, "0");
     const content = await execNostrbook("read_nip", nipNumber);
-    return JSON.stringify({ 
-      number: args.number,
-      content: content || `Failed to read NIP-${args.number}`
-    }, null, 2);
+    return JSON.stringify(
+      {
+        number: args.number,
+        content: content || `Failed to read NIP-${args.number}`,
+      },
+      null,
+      2,
+    );
   },
 });
 
 server.addTool({
   name: "read_tag",
-  description: "Read documentation about a specific tag using nostrbook's tooling",
+  description:
+    "Read documentation about a specific tag using nostrbook's tooling",
   parameters: z.object({
     name: z.string().describe("Tag name to retrieve"),
   }),
   execute: async (args) => {
     const content = await execNostrbook("read_tag", args.name);
-    return JSON.stringify({ 
-      name: args.name,
-      content: content || `Failed to read tag ${args.name}`
-    }, null, 2);
+    return JSON.stringify(
+      {
+        name: args.name,
+        content: content || `Failed to read tag ${args.name}`,
+      },
+      null,
+      2,
+    );
   },
 });
 
 server.addTool({
   name: "read_kind",
-  description: "Read documentation about a specific event kind using nostrbook's tooling",
+  description:
+    "Read documentation about a specific event kind using nostrbook's tooling",
   parameters: z.object({
     number: z.number().describe("Kind number to retrieve"),
   }),
   execute: async (args) => {
     const content = await execNostrbook("read_kind", args.number.toString());
-    return JSON.stringify({ 
-      number: args.number,
-      content: content || `Failed to read kind ${args.number}`
-    }, null, 2);
+    return JSON.stringify(
+      {
+        number: args.number,
+        content: content || `Failed to read kind ${args.number}`,
+      },
+      null,
+      2,
+    );
   },
 });
 
@@ -81,9 +98,13 @@ server.addTool({
   parameters: z.object({}),
   execute: async () => {
     const content = await execNostrbook("read_protocol");
-    return JSON.stringify({ 
-      content: content || "Failed to read protocol documentation"
-    }, null, 2);
+    return JSON.stringify(
+      {
+        content: content || "Failed to read protocol documentation",
+      },
+      null,
+      2,
+    );
   },
 });
 
@@ -93,9 +114,13 @@ server.addTool({
   parameters: z.object({}),
   execute: async () => {
     const content = await execNostrbook("read_nips_index");
-    return JSON.stringify({ 
-      content: content || "Failed to read NIPs index"
-    }, null, 2);
+    return JSON.stringify(
+      {
+        content: content || "Failed to read NIPs index",
+      },
+      null,
+      2,
+    );
   },
 });
 

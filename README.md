@@ -25,13 +25,27 @@ This enables AI assistants to provide accurate and current information about Nos
 
 ## Usage
 
+This extension requires [Deno](https://deno.com/). Please install it on your system before continuing:
+
+```bash
+curl -fsSL https://deno.land/install.sh | sh
+```
+
 ### With Goose
 
-If you're using [Goose](https://block.github.io/goose/), you can load this MCP as an extension:
+If you're using [Goose](https://block.github.io/goose/), you can try this MCP in a session:
 
 ```bash
 goose session --with-extension="deno run -A jsr:@nostrbook/mcp"
 ```
+
+To install it permanently:
+
+1. Run `goose configure`
+2. Choose "Add Extension"
+3. Choose "Command-line Extension"
+4. Call it "nostr"
+5. Enter `deno run -A jsr:@nostrbook/mcp` as the command
 
 ### Available Tools
 

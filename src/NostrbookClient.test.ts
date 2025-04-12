@@ -1,6 +1,7 @@
 import { assertEquals, assertRejects } from '@std/assert';
 
-import { HTTPError, NostrbookClient } from './NostrbookClient.ts';
+import { HTTPError } from './HTTPError.ts';
+import { NostrbookClient } from './NostrbookClient.ts';
 
 Deno.test('NostrbookClient', async (t) => {
   // deno-lint-ignore require-await

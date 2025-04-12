@@ -1,3 +1,4 @@
+import { HTTPError } from './HTTPError.ts';
 import { llmstxtUrl } from './llmstxt.ts';
 
 export interface NostrbookClientOpts {
@@ -38,12 +39,5 @@ export class NostrbookClient {
 
   readProtocol(slug: string): Promise<string> {
     return this.get(`/protocol/${slug}`);
-  }
-}
-
-export class HTTPError extends Error {
-  constructor(readonly response: Response, readonly request: Request) {
-    super(`HTTP Error: ${response.status} ${request.method} ${request.url}`);
-    this.name = 'HTTPError';
   }
 }

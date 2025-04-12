@@ -1,34 +1,8 @@
 import { FastMCP } from '@glama/fastmcp';
 import { z } from 'zod';
 
-// Execute a nostrbook task and capture stdout
-async function execNostrbook(
-  taskName: string,
-  ...args: string[]
-): Promise<string> {
-  const cmd = new Deno.Command('deno', {
-    args: ['task', taskName, ...args],
-    cwd: './nostrbook',
-    stdout: 'piped',
-    stderr: 'piped',
-  });
-
-  try {
-    const output = await cmd.output();
-    if (!output.success) {
-      const error = new TextDecoder().decode(output.stderr);
-      throw new Error(error);
-    }
-    return new TextDecoder().decode(output.stdout);
-  } catch (error) {
-    // Log the error to stderr but return empty content
-    console.error(error);
-    return '';
-  }
-}
-
 const server = new FastMCP({
-  name: 'nostr-mcp',
+  name: 'nostr',
   version: '0.1.0',
 });
 

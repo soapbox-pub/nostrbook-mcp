@@ -69,7 +69,7 @@ Deno.test('NostrMcpServer', async (t) => {
       content: [{
         type: 'text',
         text:
-          'No documentation found for kind 31890. Try using the `read_nips_index` tool to find the correct NIP.',
+          "No documentation found for kind 31890. Try using the `read_nips_index` tool to see if it's specified by a NIP.",
       }],
       isError: true,
     });

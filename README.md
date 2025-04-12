@@ -185,4 +185,4 @@ Contributions are welcome! Here's how you can contribute:
 
 ## License
 
-[GNU General Public License v3.0](./LICENSE)
+[AGPL v3.0](./LICENSE)

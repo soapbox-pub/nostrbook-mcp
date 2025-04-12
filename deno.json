@@ -2,6 +2,18 @@
   "name": "nostr-mcp",
   "version": "0.1.0",
   "exports": "./src/mod.ts",
+  "publish": {
+    "include": [
+      "src/**/*.ts",
+      "README.md",
+      "LICENSE.md",
+      "deno.json"
+    ],
+    "exclude": [
+      "**/README.md",
+      "**/*.test.ts"
+    ]
+  },
   "tasks": {
     "mcp": "deno run --allow-net --allow-run --allow-read --allow-env src/mod.ts",
     "test": "deno test --allow-net",

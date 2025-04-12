@@ -10,7 +10,9 @@
     "goose": "goose session --with-extension=\"deno task start\"",
     "test": "deno test -A",
     "check": "deno check .",
-    "lint": "deno lint"
+    "lint": "deno lint",
+    "tools": "echo '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}' | deno task start",
+    "resources": "echo '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"resources/list\"}' | deno task start"
   },
   "imports": {
     "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.9.0",

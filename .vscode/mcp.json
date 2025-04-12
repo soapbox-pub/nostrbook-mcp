@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "nostr": {
+      "type": "stdio",
+      "command": "deno",
+      "args": ["run", "-A", "jsr:@nostrbook/mcp"]
+    }
+  }
+}

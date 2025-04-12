@@ -31,7 +31,25 @@ This extension requires [Deno](https://deno.com/). Please install it on your sys
 curl -fsSL https://deno.land/install.sh | sh
 ```
 
-### With Goose
+### VSCode
+
+In your project, create `.vscode/mcp.json`:
+
+```json
+{
+  "servers": {
+    "nostr": {
+      "type": "stdio",
+      "command": "deno",
+      "args": ["run", "-A", "jsr:@nostrbook/mcp"]
+    }
+  }
+}
+```
+
+Now the MCP will be available to Copilot. For more information, see [_Use MCP servers in VS Code_](https://code.visualstudio.com/docs/copilot/chat/mcp-servers).
+
+### Goose
 
 If you're using [Goose](https://block.github.io/goose/), you can try this MCP in a session:
 

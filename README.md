@@ -14,12 +14,6 @@ When enabled, agents will gain access to the following tools.
 
 ## Installation
 
-This extension requires [Deno](https://deno.com/). Please install it on your system before continuing:
-
-```bash
-curl -fsSL https://deno.land/install.sh | sh
-```
-
 ### VSCode
 
 In your project, create `.vscode/mcp.json`:
@@ -29,8 +23,8 @@ In your project, create `.vscode/mcp.json`:
   "servers": {
     "nostr": {
       "type": "stdio",
-      "command": "deno",
-      "args": ["run", "-A", "jsr:@nostrbook/mcp"]
+      "command": "npx",
+      "args": ["-y", "deno", "run", "-A", "jsr:@nostrbook/mcp"]
     }
   }
 }
@@ -46,7 +40,7 @@ To install as a [Goose](https://block.github.io/goose/) extension:
 2. Choose "Add Extension"
 3. Choose "Command-line Extension"
 4. Enter "nostr" as the name
-5. Enter `deno run -A jsr:@nostrbook/mcp` as the command
+5. Enter `npx -y deno run -A jsr:@nostrbook/mcp` as the command
 
 ## Contributing
 

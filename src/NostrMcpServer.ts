@@ -1,4 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { NRelay1 } from '@nostrify/nostrify';
+import { nip19 } from 'nostr-tools';
 import { z } from 'zod';
 
 import { HTTPError } from './HTTPError.ts';
@@ -18,7 +20,7 @@ export class NostrMcpServer extends McpServer {
   constructor(opts: NostrMcpServerOpts = {}) {
     super({
       name: 'nostr',
-      version: '0.2.0',
+      version: '0.3.0',
     });
 
     const {
@@ -61,6 +63,73 @@ export class NostrMcpServer extends McpServer {
           }
           throw error;
         }
+      },
+    );
+
+    this.tool(
+      'read_custom_nip',
+      'Read a Nostr community NIP document',
+      {
+        naddr: z
+          .custom<`naddr1${string}`>()
+          .superRefine((val, ctx) => {
+            let decoded: nip19.DecodedResult;
+            try {
+              decoded = nip19.decode(val);
+            } catch {
+              ctx.addIssue({
+                code: 'custom',
+                message:
+                  `Failed to decode Nostr address. Invalid NIP-19 identifier: ${val}`,
+              });
+              return;
+            }
+            if (decoded.type !== 'naddr') {
+              ctx.addIssue({
+                code: 'custom',
+                message:
+                  'Wrong Nostr identifier type. Nostr address must start with `naddr1`',
+              });
+              return;
+            }
+            if (decoded.data.kind !== 30817) {
+              ctx.addIssue({
+                code: 'custom',
+                message:
+                  `The provided Nostr address does not represent a NIP document. Expected kind 30817, got ${decoded.data.kind}`,
+              });
+              return;
+            }
+          })
+          .describe(
+            'Nostr address starting with `naddr1`, e.g. `naddr1qvzqqqrcvypzqprpljlvcnpnw3pejvkkhrc3y6wvmd7vjuad0fg2ud3dky66gaxaqqxku6tswvkk7m3ddehhxarjqk4nmy`',
+          ),
+      },
+      async ({ naddr }) => {
+        const { data: addr } = nip19.decode(naddr);
+        const relay = new NRelay1(addr.relays?.[0] ?? 'wss://ditto.pub/relay');
+
+        const [event] = await relay.query(
+          [{
+            kinds: [addr.kind],
+            authors: [addr.pubkey],
+            '#d': [addr.identifier],
+          }],
+          { signal: AbortSignal.timeout(8_000) },
+        );
+
+        if (!event) {
+          return {
+            content: [{
+              type: 'text',
+              text:
+                'No event found for the provided Nostr address. Make sure it exists and is accessible.',
+              isError: true,
+            }],
+          };
+        }
+
+        return { content: [{ type: 'text', text: event.content }] };
       },
     );
 

@@ -2,14 +2,18 @@
   "name": "@nostrbook/mcp",
   "version": "0.4.0",
   "type": "module",
-  "bin": "dist/mcp",
-  "files": ["dist"],
+  "bin": {
+    "mcp": "dist/mcp"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "node --test src/**/*.test.ts",
     "build": "node scripts/build.ts",
     "dev": "node src/stdio.ts",
     "check": "tsc --noEmit",
-    "prepublish": "npm i && npm run build"
+    "prepublishOnly": "npm i && npm run build"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

@@ -1,7 +1,7 @@
 import * as esbuild from 'npm:esbuild';
 import { chmodSync } from 'node:fs';
 
-const result = await esbuild.build({
+await esbuild.build({
   entryPoints: ['src/stdio.ts'],
   bundle: true,
   outfile: 'dist/mcp',
@@ -13,4 +13,3 @@ const result = await esbuild.build({
 });
 
 chmodSync('dist/mcp', 0o755);
-console.log(result);

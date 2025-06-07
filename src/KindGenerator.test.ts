@@ -6,8 +6,6 @@ Deno.test('KindGenerator', async (t) => {
     const nipsIndex = await Deno.readTextFile('./src/fixtures/NIPs.md');
     const usedKinds = KindGenerator.extractUsedKinds(nipsIndex);
 
-    console.log(usedKinds);
-
     // Check that some expected kinds are extracted from the real NIPs index
     const expectedKinds = [
       0,

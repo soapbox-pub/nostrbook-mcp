@@ -44,6 +44,9 @@
   "fmt": {
     "lineWidth": 80,
     "singleQuote": true,
-    "proseWrap": "preserve"
+    "proseWrap": "preserve",
+    "exclude": [
+      "src/fixtures"
+    ]
   }
 }

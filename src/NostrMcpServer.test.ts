@@ -9,12 +9,13 @@ import { assertEquals } from '@std/assert';
 import { NostrMcpServer } from './NostrMcpServer.ts';
 
 Deno.test('NostrMcpServer', async (t) => {
-  // deno-lint-ignore require-await
   const mockFetch: typeof fetch = async (input, init) => {
     const { url } = new Request(input, init);
     switch (url) {
       case 'https://raw.githubusercontent.com/nostr-protocol/nips/refs/heads/master/01.md':
         return new Response('NIP-01');
+      case 'https://raw.githubusercontent.com/nostr-protocol/nips/refs/heads/master/README.md':
+        return new Response(await Deno.readTextFile('./src/fixtures/NIPs.md'));
       default:
         return new Response('Not Found', { status: 404 });
     }
@@ -41,7 +42,9 @@ Deno.test('NostrMcpServer', async (t) => {
       ListToolsResultSchema,
     );
 
-    assertEquals(result.tools[0].name, 'read_nip');
+    const toolNames = result.tools.map((tool) => tool.name);
+    assertEquals(toolNames.includes('read_nip'), true);
+    assertEquals(toolNames.includes('generate_kind'), true);
   });
 
   await t.step('tools/call', async () => {
@@ -73,5 +76,53 @@ Deno.test('NostrMcpServer', async (t) => {
       }],
       isError: true,
     });
+  });
+
+  await t.step('tools/call (generate_kind regular)', async () => {
+    const result = await client.request(
+      {
+        method: 'tools/call',
+        params: { name: 'generate_kind', arguments: { range: 'regular' } },
+      },
+      CallToolResultSchema,
+    );
+
+    // The result should contain a kind number between 1000-9999 that's not in our mock data
+    const content = result.content?.[0];
+    if (content?.type === 'text') {
+      const kindMatch = content.text.match(/Generated unused kind: (\d+)/);
+      if (kindMatch) {
+        const generatedKind = parseInt(kindMatch[1], 10);
+        // Should be in regular range
+        assertEquals(generatedKind >= 1000 && generatedKind <= 9999, true);
+        // Should not be one of the used kinds from our mock data
+        const usedKinds = [0, 1, 3, 4, 5, 7, 1984];
+        assertEquals(usedKinds.includes(generatedKind), false);
+      }
+    }
+  });
+
+  await t.step('tools/call (generate_kind addressable)', async () => {
+    const result = await client.request(
+      {
+        method: 'tools/call',
+        params: { name: 'generate_kind', arguments: { range: 'addressable' } },
+      },
+      CallToolResultSchema,
+    );
+
+    // The result should contain a kind number between 30000-39999 that's not in our mock data
+    const content = result.content?.[0];
+    if (content?.type === 'text') {
+      const kindMatch = content.text.match(/Generated unused kind: (\d+)/);
+      if (kindMatch) {
+        const generatedKind = parseInt(kindMatch[1], 10);
+        // Should be in addressable range
+        assertEquals(generatedKind >= 30000 && generatedKind <= 39999, true);
+        // Should not be one of the used kinds from our mock data
+        const usedKinds = [30000, 30001];
+        assertEquals(usedKinds.includes(generatedKind), false);
+      }
+    }
   });
 });

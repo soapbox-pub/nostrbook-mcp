@@ -4,6 +4,7 @@ import { nip19 } from 'nostr-tools';
 import { z } from 'zod';
 
 import { HTTPError } from './HTTPError.ts';
+import { KindGenerator, type KindRange } from './KindGenerator.ts';
 import { NIPsClient } from './NIPsClient.ts';
 import { NostrbookClient } from './NostrbookClient.ts';
 
@@ -206,6 +207,47 @@ export class NostrMcpServer extends McpServer {
       async () => ({
         content: [{ type: 'text', text: await this.nips.readIndex() }],
       }),
+    );
+
+    this.tool(
+      'generate_kind',
+      'Generate an unused Nostr event kind number in the specified range',
+      {
+        range: z.enum(['regular', 'replaceable', 'ephemeral', 'addressable'])
+          .describe(
+            'Kind range: regular (1000-9999), replaceable (10000-19999), ephemeral (20000-29999), addressable (30000-39999)',
+          ) as z.ZodType<KindRange>,
+      },
+      async ({ range }) => {
+        try {
+          const nipsIndex = await this.nips.readIndex();
+          const usedKinds = KindGenerator.extractUsedKinds(nipsIndex);
+          const availableKind = KindGenerator.generateAvailableKind(
+            range,
+            usedKinds,
+          );
+
+          const rangeInfo = KindGenerator.getKindRangeInfo(range);
+
+          return {
+            content: [{
+              type: 'text',
+              text:
+                `Generated unused kind: ${availableKind}\n\nRange: ${rangeInfo.name} (${rangeInfo.min}-${rangeInfo.max})\nDescription: ${rangeInfo.description}\n\nThis kind number is currently not used by any official NIP.`,
+            }],
+          };
+        } catch (error) {
+          return {
+            content: [{
+              type: 'text',
+              text: `Error generating kind: ${
+                error instanceof Error ? error.message : 'Unknown error'
+              }`,
+            }],
+            isError: true,
+          };
+        }
+      },
     );
   }
 }

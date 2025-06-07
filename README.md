@@ -11,6 +11,7 @@ When enabled, agents will gain access to the following tools.
 - **read_tag(tag)**: Fetches and reads a tag doc from nostrbook.dev
 - **read_protocol(doc)**: Fetches and reads a a protocol doc ("event", "filter", "client", "relay", etc) from nostrbook.dev
 - **read_nips_index()**: Fetches and reads the NIPs README to fill in any missing blanks
+- **generate_kind(range)**: Generates an unused Nostr event kind number in the specified range (regular: 1000-9999, replaceable: 10000-19999, ephemeral: 20000-29999, addressable: 30000-39999)
 
 ## Installation
 

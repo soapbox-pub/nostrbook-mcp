@@ -13,6 +13,10 @@
       "command": "deno test -A",
       "description": "Run the test suite"
     },
+    "build": {
+      "command": "deno run -A scripts/build.ts",
+      "description": "Bundle the Model Context Protocol server into a single file"
+    },
     "start": {
       "command": "deno run -A src/stdio.ts",
       "description": "Start the Model Context Protocol server"

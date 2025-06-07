@@ -1,9 +1,5 @@
 {
-  "name": "@nostrbook/mcp",
-  "version": "0.3.0",
-  "exports": {
-    ".": "./src/stdio.ts"
-  },
+  "nodeModulesDir": "auto",
   "tasks": {
     "lint": {
       "command": "deno lint",
@@ -33,13 +29,6 @@
       "command": "echo '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}' | deno task start",
       "description": "List available tools in the Model Context Protocol server"
     }
-  },
-  "imports": {
-    "@modelcontextprotocol/sdk": "npm:@modelcontextprotocol/sdk@^1.9.0",
-    "@nostrify/nostrify": "jsr:@nostrify/nostrify@^0.46.2",
-    "@std/assert": "jsr:@std/assert@^1.0.12",
-    "nostr-tools": "npm:nostr-tools@^2.13.3",
-    "zod": "npm:zod@^3.24.2"
   },
   "fmt": {
     "lineWidth": 80,

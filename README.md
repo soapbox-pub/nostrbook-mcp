@@ -25,7 +25,7 @@ In your project, create `.vscode/mcp.json`:
     "nostr": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "deno", "run", "-A", "jsr:@nostrbook/mcp"]
+      "args": ["-y", "@nostrbook/mcp@latest"]
     }
   }
 }
@@ -41,50 +41,13 @@ To install as a [Goose](https://block.github.io/goose/) extension:
 2. Choose "Add Extension"
 3. Choose "Command-line Extension"
 4. Enter "nostr" as the name
-5. Enter `npx -y deno run -A jsr:@nostrbook/mcp` as the command
-
-## Contributing
-
-Ensure Deno is installed, then run `deno task dev` to launch the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector). From here you can easily interact with and debug the server.
-
-Other tasks:
-
-```bash
-# Start goose with the current directory enabled as an extension
-deno task goose
-
-# Run the MCP server
-deno task start
-
-# Run tests with Deno
-deno task test
-
-# Run tests with Node.js native test runner
-deno task test:node
-# or directly with npm:
-npm test
-
-# Type check
-deno task check
-
-# Lint code
-deno task lint
-```
-
-### Testing
-
-This project supports both Deno and Node.js test runners:
-
-- **Deno tests**: Use `deno task test` to run tests with Deno's built-in test runner
-- **Node.js tests**: Use `deno task test:node` or `npm test` to run tests with Node.js native test runner (Node 18+)
-
-The Node.js tests use TypeScript with the `tsx` loader and Node's native `node:test` and `node:assert` modules.
+5. Enter `npx -y @nostrbook/mcp@latest` as the command
 
 ### Architecture
 
 Nostr MCP is built with:
 
-- [Deno](https://deno.com) - The JavaScript/TypeScript runtime
+- Node - The JavaScript/TypeScript runtime
 - [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk) - SDK for building MCPs
 - [Zod](https://zod.dev) - TypeScript-first schema validation
 - HTTP client for fetching documentation from:

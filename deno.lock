@@ -6,12 +6,10 @@
     "npm:@modelcontextprotocol/inspector@*": "0.8.2",
     "npm:@modelcontextprotocol/sdk@^1.12.1": "1.12.1_express@5.1.0_zod@3.24.2",
     "npm:@modelcontextprotocol/sdk@^1.9.0": "1.9.0_express@5.1.0_zod@3.24.2",
-    "npm:@types/node@*": "22.12.0",
     "npm:esbuild@*": "0.25.5",
     "npm:nostr-tools@^2.14.2": "2.14.2",
     "npm:zod@^3.23.8": "3.24.2",
-    "npm:zod@^3.24.2": "3.24.2",
-    "npm:zod@^3.25.56": "3.25.56"
+    "npm:zod@^3.24.2": "3.24.2"
   },
   "npm": {
     "@cspotcode/source-map-support@0.8.1": {
@@ -191,7 +189,7 @@
         "lru-cache",
         "nostr-tools",
         "websocket-ts",
-        "zod@3.25.56"
+        "zod"
       ],
       "tarball": "https://npm.jsr.io/~/11/@jsr/nostrify__nostrify/0.46.3.tgz"
     },
@@ -245,7 +243,7 @@
         "serve-handler",
         "tailwind-merge",
         "tailwindcss-animate",
-        "zod@3.24.2"
+        "zod"
       ],
       "bin": true
     },
@@ -256,7 +254,7 @@
         "cors",
         "express@4.21.2",
         "ws",
-        "zod@3.24.2"
+        "zod"
       ],
       "bin": true
     },
@@ -284,7 +282,7 @@
         "express-rate-limit",
         "pkce-challenge@5.0.0",
         "raw-body@3.0.0",
-        "zod@3.24.2",
+        "zod",
         "zod-to-json-schema"
       ]
     },
@@ -299,7 +297,7 @@
         "express-rate-limit",
         "pkce-challenge@5.0.0",
         "raw-body@3.0.0",
-        "zod@3.24.2",
+        "zod",
         "zod-to-json-schema"
       ]
     },
@@ -1818,14 +1816,11 @@
     "zod-to-json-schema@3.24.5_zod@3.24.2": {
       "integrity": "sha512-/AuWwMP+YqiPbsJx5D6TfgRTc4kTLjsh5SOcd4bLsfUg2RcEXrFMJl1DGgdHy2aCfsIA/cr/1JM0xcB2GZji8g==",
       "dependencies": [
-        "zod@3.24.2"
+        "zod"
       ]
     },
     "zod@3.24.2": {
       "integrity": "sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ=="
-    },
-    "zod@3.25.56": {
-      "integrity": "sha512-rd6eEF3BTNvQnR2e2wwolfTmUTnp70aUTqr0oaGbHifzC3BKJsoV+Gat8vxUMR1hwOKBs6El+qWehrHbCpW6SQ=="
     }
   },
   "workspace": {
@@ -1835,7 +1830,7 @@
         "npm:@jsr/std__assert@^1.0.13",
         "npm:@modelcontextprotocol/sdk@^1.12.1",
         "npm:nostr-tools@^2.14.2",
-        "npm:zod@^3.25.56"
+        "npm:zod@^3.24.2"
       ]
     }
   }

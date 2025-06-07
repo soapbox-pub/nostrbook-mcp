@@ -1,10 +1,9 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { test } from 'node:test';
+import { strict as assert } from 'node:assert';
 
-import { HTTPError } from './HTTPError.ts';
 import { NIPsClient } from './NIPsClient.ts';
 
-Deno.test('NIPsClient', async (t) => {
-  // deno-lint-ignore require-await
+test('NIPsClient', async (t) => {
   const mockFetch: typeof fetch = async (input, init) => {
     const { url } = new Request(input, init);
     switch (url) {
@@ -25,26 +24,28 @@ Deno.test('NIPsClient', async (t) => {
     fetch: mockFetch,
   });
 
-  await t.step('readNip', async () => {
+  await t.test('readNip', async () => {
     const doc = await client.readNip('01');
-    assertEquals(doc, 'NIP-01');
+    assert.equal(doc, 'NIP-01');
   });
 
-  await t.step('readIndex', async () => {
+  await t.test('readIndex', async () => {
     const doc = await client.readIndex();
-    assertEquals(doc, 'NIPs');
+    assert.equal(doc, 'NIPs');
   });
 
-  await t.step('readBreaking', async () => {
+  await t.test('readBreaking', async () => {
     const doc = await client.readBreaking();
-    assertEquals(doc, 'Breaking Changes');
+    assert.equal(doc, 'Breaking Changes');
   });
 
-  await t.step('readNip with 404', async () => {
-    await assertRejects(
+  await t.test('readNip with 404', async () => {
+    await assert.rejects(
       () => client.readNip('abc'),
-      HTTPError,
-      'HTTP Error: 404 GET https://git.test/nostr-protocol/nips/refs/heads/master/abc.md',
+      {
+        name: 'HTTPError',
+        message: 'HTTP Error: 404 GET https://git.test/nostr-protocol/nips/refs/heads/master/abc.md',
+      }
     );
   });
 });

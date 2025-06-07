@@ -1,21 +1,29 @@
+import { test } from 'node:test';
+import { strict as assert } from 'node:assert';
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import {
   CallToolResultSchema,
   ListToolsResultSchema,
 } from '@modelcontextprotocol/sdk/types.js';
-import { assertEquals } from '@std/assert';
 
 import { NostrMcpServer } from './NostrMcpServer.ts';
 
-Deno.test('NostrMcpServer', async (t) => {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+test('NostrMcpServer', async (t) => {
   const mockFetch: typeof fetch = async (input, init) => {
     const { url } = new Request(input, init);
     switch (url) {
       case 'https://raw.githubusercontent.com/nostr-protocol/nips/refs/heads/master/01.md':
         return new Response('NIP-01');
       case 'https://raw.githubusercontent.com/nostr-protocol/nips/refs/heads/master/README.md':
-        return new Response(await Deno.readTextFile('./src/fixtures/NIPs.md'));
+        return new Response(await readFile(join(__dirname, 'fixtures', 'NIPs.md'), 'utf-8'));
       default:
         return new Response('Not Found', { status: 404 });
     }
@@ -36,18 +44,18 @@ Deno.test('NostrMcpServer', async (t) => {
     server.connect(serverTransport),
   ]);
 
-  await t.step('tools/list', async () => {
+  await t.test('tools/list', async () => {
     const result = await client.request(
       { method: 'tools/list' },
       ListToolsResultSchema,
     );
 
     const toolNames = result.tools.map((tool) => tool.name);
-    assertEquals(toolNames.includes('read_nip'), true);
-    assertEquals(toolNames.includes('generate_kind'), true);
+    assert.equal(toolNames.includes('read_nip'), true);
+    assert.equal(toolNames.includes('generate_kind'), true);
   });
 
-  await t.step('tools/call', async () => {
+  await t.test('tools/call', async () => {
     const result = await client.request(
       {
         method: 'tools/call',
@@ -56,10 +64,10 @@ Deno.test('NostrMcpServer', async (t) => {
       CallToolResultSchema,
     );
 
-    assertEquals(result, { content: [{ type: 'text', text: 'NIP-01' }] });
+    assert.deepEqual(result, { content: [{ type: 'text', text: 'NIP-01' }] });
   });
 
-  await t.step('tools/call (read_kind 404)', async () => {
+  await t.test('tools/call (read_kind 404)', async () => {
     const result = await client.request(
       {
         method: 'tools/call',
@@ -68,7 +76,7 @@ Deno.test('NostrMcpServer', async (t) => {
       CallToolResultSchema,
     );
 
-    assertEquals(result, {
+    assert.deepEqual(result, {
       content: [{
         type: 'text',
         text:
@@ -78,7 +86,7 @@ Deno.test('NostrMcpServer', async (t) => {
     });
   });
 
-  await t.step('tools/call (generate_kind regular)', async () => {
+  await t.test('tools/call (generate_kind regular)', async () => {
     const result = await client.request(
       {
         method: 'tools/call',
@@ -94,15 +102,15 @@ Deno.test('NostrMcpServer', async (t) => {
       if (kindMatch) {
         const generatedKind = parseInt(kindMatch[1], 10);
         // Should be in regular range
-        assertEquals(generatedKind >= 1000 && generatedKind <= 9999, true);
+        assert.equal(generatedKind >= 1000 && generatedKind <= 9999, true);
         // Should not be one of the used kinds from our mock data
         const usedKinds = [0, 1, 3, 4, 5, 7, 1984];
-        assertEquals(usedKinds.includes(generatedKind), false);
+        assert.equal(usedKinds.includes(generatedKind), false);
       }
     }
   });
 
-  await t.step('tools/call (generate_kind addressable)', async () => {
+  await t.test('tools/call (generate_kind addressable)', async () => {
     const result = await client.request(
       {
         method: 'tools/call',
@@ -118,10 +126,10 @@ Deno.test('NostrMcpServer', async (t) => {
       if (kindMatch) {
         const generatedKind = parseInt(kindMatch[1], 10);
         // Should be in addressable range
-        assertEquals(generatedKind >= 30000 && generatedKind <= 39999, true);
+        assert.equal(generatedKind >= 30000 && generatedKind <= 39999, true);
         // Should not be one of the used kinds from our mock data
         const usedKinds = [30000, 30001];
-        assertEquals(usedKinds.includes(generatedKind), false);
+        assert.equal(usedKinds.includes(generatedKind), false);
       }
     }
   });

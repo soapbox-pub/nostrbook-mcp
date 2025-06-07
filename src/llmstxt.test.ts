@@ -1,8 +1,9 @@
-import { assertEquals } from '@std/assert';
+import { test } from 'node:test';
+import { strict as assert } from 'node:assert';
 
 import { llmstxtUrl } from './llmstxt.ts';
 
-Deno.test('llmstxtUrl', () => {
+test('llmstxtUrl', () => {
   const testCases = [
     {
       input: 'https://example.com',
@@ -28,6 +29,6 @@ Deno.test('llmstxtUrl', () => {
 
   for (const { input, expected } of testCases) {
     const result = llmstxtUrl(input);
-    assertEquals(result.toString(), expected);
+    assert.equal(result.toString(), expected);
   }
 });

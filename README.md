@@ -56,8 +56,13 @@ deno task goose
 # Run the MCP server
 deno task start
 
-# Run tests
+# Run tests with Deno
 deno task test
+
+# Run tests with Node.js native test runner
+deno task test:node
+# or directly with npm:
+npm test
 
 # Type check
 deno task check
@@ -65,6 +70,15 @@ deno task check
 # Lint code
 deno task lint
 ```
+
+### Testing
+
+This project supports both Deno and Node.js test runners:
+
+- **Deno tests**: Use `deno task test` to run tests with Deno's built-in test runner
+- **Node.js tests**: Use `deno task test:node` or `npm test` to run tests with Node.js native test runner (Node 18+)
+
+The Node.js tests use TypeScript with the `tsx` loader and Node's native `node:test` and `node:assert` modules.
 
 ### Architecture
 

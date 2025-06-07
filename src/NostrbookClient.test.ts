@@ -1,10 +1,9 @@
-import { assertEquals, assertRejects } from '@std/assert';
+import { test } from 'node:test';
+import { strict as assert } from 'node:assert';
 
-import { HTTPError } from './HTTPError.ts';
 import { NostrbookClient } from './NostrbookClient.ts';
 
-Deno.test('NostrbookClient', async (t) => {
-  // deno-lint-ignore require-await
+test('NostrbookClient', async (t) => {
   const mockFetch: typeof fetch = async (input, init) => {
     const { url } = new Request(input, init);
     switch (url) {
@@ -24,26 +23,28 @@ Deno.test('NostrbookClient', async (t) => {
     fetch: mockFetch,
   });
 
-  await t.step('readKind', async () => {
+  await t.test('readKind', async () => {
     const doc = await client.readKind(1);
-    assertEquals(doc, 'Kind: 1');
+    assert.equal(doc, 'Kind: 1');
   });
 
-  await t.step('readTag', async () => {
+  await t.test('readTag', async () => {
     const doc = await client.readTag('p');
-    assertEquals(doc, 'Tag: p');
+    assert.equal(doc, 'Tag: p');
   });
 
-  await t.step('readProtocol', async () => {
+  await t.test('readProtocol', async () => {
     const doc = await client.readProtocol('relay');
-    assertEquals(doc, 'Protocol: relay');
+    assert.equal(doc, 'Protocol: relay');
   });
 
-  await t.step('readKind with 404', async () => {
-    await assertRejects(
+  await t.test('readKind with 404', async () => {
+    await assert.rejects(
       () => client.readKind(999),
-      HTTPError,
-      'HTTP Error: 404 GET https://nostrbook.test/kinds/999.md',
+      {
+        name: 'HTTPError',
+        message: 'HTTP Error: 404 GET https://nostrbook.test/kinds/999.md',
+      }
     );
   });
 });

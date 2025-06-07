@@ -1,9 +1,17 @@
-import { assertEquals } from '@std/assert';
+import { test } from 'node:test';
+import { strict as assert } from 'node:assert';
+import { readFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
 import { KindGenerator } from './KindGenerator.ts';
 
-Deno.test('KindGenerator', async (t) => {
-  await t.step('extractUsedKinds with real NIPs fixture', async () => {
-    const nipsIndex = await Deno.readTextFile('./src/fixtures/NIPs.md');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+test('KindGenerator', async (t) => {
+  await t.test('extractUsedKinds with real NIPs fixture', async () => {
+    const nipsIndex = await readFile(join(__dirname, 'fixtures', 'NIPs.md'), 'utf-8');
     const usedKinds = KindGenerator.extractUsedKinds(nipsIndex);
 
     // Check that some expected kinds are extracted from the real NIPs index
@@ -151,7 +159,7 @@ Deno.test('KindGenerator', async (t) => {
     ];
 
     for (const kind of expectedKinds) {
-      assertEquals(
+      assert.equal(
         usedKinds.has(kind),
         true,
         `Kind ${kind} should be extracted from NIPs index`,
@@ -161,7 +169,7 @@ Deno.test('KindGenerator', async (t) => {
     // Check that ranges are properly extracted
     // `5000`-`5999` should add all numbers from 5000 to 5999
     for (let i = 5000; i <= 5999; i++) {
-      assertEquals(
+      assert.equal(
         usedKinds.has(i),
         true,
         `Kind ${i} should be in range 5000-5999`,
@@ -170,7 +178,7 @@ Deno.test('KindGenerator', async (t) => {
 
     // `6000`-`6999` should add all numbers from 6000 to 6999
     for (let i = 6000; i <= 6999; i++) {
-      assertEquals(
+      assert.equal(
         usedKinds.has(i),
         true,
         `Kind ${i} should be in range 6000-6999`,
@@ -179,7 +187,7 @@ Deno.test('KindGenerator', async (t) => {
 
     // `9000`-`9030` should add all numbers from 9000 to 9030
     for (let i = 9000; i <= 9030; i++) {
-      assertEquals(
+      assert.equal(
         usedKinds.has(i),
         true,
         `Kind ${i} should be in range 9000-9030`,
@@ -188,7 +196,7 @@ Deno.test('KindGenerator', async (t) => {
 
     // `39000-9` should add all numbers from 39000 to 39009
     for (let i = 39000; i <= 39009; i++) {
-      assertEquals(
+      assert.equal(
         usedKinds.has(i),
         true,
         `Kind ${i} should be in range 39000-39009`,
@@ -197,7 +205,7 @@ Deno.test('KindGenerator', async (t) => {
 
     // `1630`-`1633` should add all numbers from 1630 to 1633
     for (let i = 1630; i <= 1633; i++) {
-      assertEquals(
+      assert.equal(
         usedKinds.has(i),
         true,
         `Kind ${i} should be in range 1630-1633`,
@@ -205,7 +213,7 @@ Deno.test('KindGenerator', async (t) => {
     }
   });
 
-  await t.step('extractUsedKinds with mock data', () => {
+  await t.test('extractUsedKinds with mock data', () => {
     const mockNipsIndex = `
 ## Event Kinds
 
@@ -221,14 +229,14 @@ Deno.test('KindGenerator', async (t) => {
     const usedKinds = KindGenerator.extractUsedKinds(mockNipsIndex);
 
     // Check individual kinds
-    assertEquals(usedKinds.has(0), true);
-    assertEquals(usedKinds.has(1), true);
-    assertEquals(usedKinds.has(3), true);
-    assertEquals(usedKinds.has(30000), true);
+    assert.equal(usedKinds.has(0), true);
+    assert.equal(usedKinds.has(1), true);
+    assert.equal(usedKinds.has(3), true);
+    assert.equal(usedKinds.has(30000), true);
 
     // Check range
     for (let i = 1000; i <= 1999; i++) {
-      assertEquals(
+      assert.equal(
         usedKinds.has(i),
         true,
         `Kind ${i} should be in range 1000-1999`,
@@ -236,26 +244,26 @@ Deno.test('KindGenerator', async (t) => {
     }
   });
 
-  await t.step('getKindRangeInfo', () => {
+  await t.test('getKindRangeInfo', () => {
     const regularRange = KindGenerator.getKindRangeInfo('regular');
-    assertEquals(regularRange.min, 1000);
-    assertEquals(regularRange.max, 9999);
-    assertEquals(regularRange.name, 'Regular Events');
+    assert.equal(regularRange.min, 1000);
+    assert.equal(regularRange.max, 9999);
+    assert.equal(regularRange.name, 'Regular Events');
 
     const replaceableRange = KindGenerator.getKindRangeInfo('replaceable');
-    assertEquals(replaceableRange.min, 10000);
-    assertEquals(replaceableRange.max, 19999);
+    assert.equal(replaceableRange.min, 10000);
+    assert.equal(replaceableRange.max, 19999);
 
     const ephemeralRange = KindGenerator.getKindRangeInfo('ephemeral');
-    assertEquals(ephemeralRange.min, 20000);
-    assertEquals(ephemeralRange.max, 29999);
+    assert.equal(ephemeralRange.min, 20000);
+    assert.equal(ephemeralRange.max, 29999);
 
     const addressableRange = KindGenerator.getKindRangeInfo('addressable');
-    assertEquals(addressableRange.min, 30000);
-    assertEquals(addressableRange.max, 39999);
+    assert.equal(addressableRange.min, 30000);
+    assert.equal(addressableRange.max, 39999);
   });
 
-  await t.step('generateAvailableKind', () => {
+  await t.test('generateAvailableKind', () => {
     const usedKinds = new Set([1000, 1001, 1002, 10000, 10001, 30000, 30001]);
 
     // Test regular range
@@ -263,31 +271,31 @@ Deno.test('KindGenerator', async (t) => {
       'regular',
       usedKinds,
     );
-    assertEquals(regularKind >= 1000 && regularKind <= 9999, true);
-    assertEquals(usedKinds.has(regularKind), false);
+    assert.equal(regularKind >= 1000 && regularKind <= 9999, true);
+    assert.equal(usedKinds.has(regularKind), false);
 
     // Test replaceable range
     const replaceableKind = KindGenerator.generateAvailableKind(
       'replaceable',
       usedKinds,
     );
-    assertEquals(replaceableKind >= 10000 && replaceableKind <= 19999, true);
-    assertEquals(usedKinds.has(replaceableKind), false);
+    assert.equal(replaceableKind >= 10000 && replaceableKind <= 19999, true);
+    assert.equal(usedKinds.has(replaceableKind), false);
 
     // Test ephemeral range
     const ephemeralKind = KindGenerator.generateAvailableKind(
       'ephemeral',
       usedKinds,
     );
-    assertEquals(ephemeralKind >= 20000 && ephemeralKind <= 29999, true);
-    assertEquals(usedKinds.has(ephemeralKind), false);
+    assert.equal(ephemeralKind >= 20000 && ephemeralKind <= 29999, true);
+    assert.equal(usedKinds.has(ephemeralKind), false);
 
     // Test addressable range
     const addressableKind = KindGenerator.generateAvailableKind(
       'addressable',
       usedKinds,
     );
-    assertEquals(addressableKind >= 30000 && addressableKind <= 39999, true);
-    assertEquals(usedKinds.has(addressableKind), false);
+    assert.equal(addressableKind >= 30000 && addressableKind <= 39999, true);
+    assert.equal(usedKinds.has(addressableKind), false);
   });
 });

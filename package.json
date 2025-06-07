@@ -3,9 +3,7 @@
   "version": "0.3.0",
   "type": "module",
   "bin": "dist/mcp",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "test": "node --test src/**/*.test.ts",
     "build": "node scripts/build.ts",

@@ -32,13 +32,13 @@ The MCP exposes the following tools to AI assistants:
 
 ## Development Workflow
 
-- **Run tests**: `deno task test`
-- **Type checking**: `deno task check`
-- **Lint code**: `deno task lint`
+- **Run tests**: `npm run test`
+- **Type checking**: `npm run check`
+- **Lint code**: `npm run lint`
 
 ## Dependencies
 
-- **Deno**: The JavaScript/TypeScript runtime
+- **Node**: The JavaScript/TypeScript runtime
 - **@modelcontextprotocol/sdk**: SDK for building MCPs
 - **Zod**: TypeScript-first schema validation
 

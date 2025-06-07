@@ -29,7 +29,7 @@ test('NostrMcpServer', async (t) => {
     }
   };
 
-  const server = new NostrMcpServer({ fetch: mockFetch });
+  const server = new NostrMcpServer({ name: 'nostr', version: '0.0.0', fetch: mockFetch });
 
   const client = new Client({
     name: 'test client',

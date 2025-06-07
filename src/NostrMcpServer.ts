@@ -9,6 +9,8 @@ import { NIPsClient } from './NIPsClient.ts';
 import { NostrbookClient } from './NostrbookClient.ts';
 
 interface NostrMcpServerOpts {
+  name: string;
+  version: string;
   fetch?: typeof fetch;
   nostrbookBaseUrl?: string;
   nipsUrlTemplate?: string;
@@ -18,10 +20,10 @@ export class NostrMcpServer extends McpServer {
   private nostrbook: NostrbookClient;
   private nips: NIPsClient;
 
-  constructor(opts: NostrMcpServerOpts = {}) {
+  constructor(opts: NostrMcpServerOpts) {
     super({
-      name: 'nostr',
-      version: '0.3.0',
+      name: opts.name,
+      version: opts.version,
     });
 
     const {

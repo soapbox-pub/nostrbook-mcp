@@ -37,7 +37,7 @@ export class KindGenerator {
     for (const pattern of kindPatterns) {
       let match;
       while ((match = pattern.exec(nipsIndex)) !== null) {
-        if (match[2] !== undefined) {
+        if (match[2] !== undefined && match[1] !== undefined) {
           // Handle range format like `5000`-`5999` or `39000-9`
           const start = parseInt(match[1], 10);
           let end = parseInt(match[2], 10);
@@ -46,9 +46,11 @@ export class KindGenerator {
           if (end < start && end < 10) {
             const startStr = match[1];
             const endStr = match[2];
-            // Replace the last digit(s) of start with end
-            const prefix = startStr.slice(0, -endStr.length);
-            end = parseInt(prefix + endStr, 10);
+            if (startStr && endStr) {
+              // Replace the last digit(s) of start with end
+              const prefix = startStr.slice(0, -endStr.length);
+              end = parseInt(prefix + endStr, 10);
+            }
           }
 
           if (
@@ -60,7 +62,7 @@ export class KindGenerator {
               usedKinds.add(i);
             }
           }
-        } else {
+        } else if (match[1] !== undefined) {
           // Handle single kind format like `1234`
           const num = parseInt(match[1], 10);
           if (!isNaN(num) && num >= 0 && num <= 65535) {

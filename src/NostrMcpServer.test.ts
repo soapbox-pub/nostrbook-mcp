@@ -99,7 +99,7 @@ test('NostrMcpServer', async (t) => {
     const content = result.content?.[0];
     if (content?.type === 'text') {
       const kindMatch = content.text.match(/Generated unused kind: (\d+)/);
-      if (kindMatch) {
+      if (kindMatch && kindMatch[1]) {
         const generatedKind = parseInt(kindMatch[1], 10);
         // Should be in regular range
         assert.equal(generatedKind >= 1000 && generatedKind <= 9999, true);
@@ -123,7 +123,7 @@ test('NostrMcpServer', async (t) => {
     const content = result.content?.[0];
     if (content?.type === 'text') {
       const kindMatch = content.text.match(/Generated unused kind: (\d+)/);
-      if (kindMatch) {
+      if (kindMatch && kindMatch[1]) {
         const generatedKind = parseInt(kindMatch[1], 10);
         // Should be in addressable range
         assert.equal(generatedKind >= 30000 && generatedKind <= 39999, true);

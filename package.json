@@ -16,6 +16,7 @@
     "@modelcontextprotocol/sdk": "^1.12.1",
     "@nostrify/nostrify": "npm:@jsr/nostrify__nostrify@^0.46.3",
     "@types/node": "^20.19.0",
+    "esbuild": "^0.25.5",
     "nostr-tools": "^2.14.2",
     "typescript": "^5.0.0",
     "zod": "^3.24.2"

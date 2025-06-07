@@ -1,6 +1,6 @@
 {
   "name": "@nostrbook/mcp",
-  "version": "0.4.0",
+  "version": "0.4.4",
   "type": "module",
   "bin": {
     "mcp": "dist/mcp"
@@ -13,7 +13,7 @@
     "build": "node scripts/build.ts",
     "dev": "node src/stdio.ts",
     "check": "tsc --noEmit",
-    "prepublishOnly": "npm i && npm run build"
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",

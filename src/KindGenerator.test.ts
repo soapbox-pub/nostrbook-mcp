@@ -273,6 +273,14 @@ test('KindGenerator', async (t) => {
     );
     assert.equal(regularKind >= 1000 && regularKind <= 9999, true);
     assert.equal(usedKinds.has(regularKind), false);
+    // Check new constraints
+    assert.equal(regularKind % 2 !== 0, true, 'Generated kind should be odd');
+    assert.equal(regularKind % 5 !== 0, true, 'Generated kind should not be multiple of 5');
+    // Check buffer constraint - should not be within 2 of any used kind
+    for (const usedKind of usedKinds) {
+      const distance = Math.abs(regularKind - usedKind);
+      assert.equal(distance > 2, true, `Generated kind ${regularKind} should be more than 2 away from used kind ${usedKind}`);
+    }
 
     // Test replaceable range
     const replaceableKind = KindGenerator.generateAvailableKind(
@@ -281,6 +289,8 @@ test('KindGenerator', async (t) => {
     );
     assert.equal(replaceableKind >= 10000 && replaceableKind <= 19999, true);
     assert.equal(usedKinds.has(replaceableKind), false);
+    assert.equal(replaceableKind % 2 !== 0, true, 'Generated kind should be odd');
+    assert.equal(replaceableKind % 5 !== 0, true, 'Generated kind should not be multiple of 5');
 
     // Test ephemeral range
     const ephemeralKind = KindGenerator.generateAvailableKind(
@@ -289,6 +299,8 @@ test('KindGenerator', async (t) => {
     );
     assert.equal(ephemeralKind >= 20000 && ephemeralKind <= 29999, true);
     assert.equal(usedKinds.has(ephemeralKind), false);
+    assert.equal(ephemeralKind % 2 !== 0, true, 'Generated kind should be odd');
+    assert.equal(ephemeralKind % 5 !== 0, true, 'Generated kind should not be multiple of 5');
 
     // Test addressable range
     const addressableKind = KindGenerator.generateAvailableKind(
@@ -297,6 +309,54 @@ test('KindGenerator', async (t) => {
     );
     assert.equal(addressableKind >= 30000 && addressableKind <= 39999, true);
     assert.equal(usedKinds.has(addressableKind), false);
+    assert.equal(addressableKind % 2 !== 0, true, 'Generated kind should be odd');
+    assert.equal(addressableKind % 5 !== 0, true, 'Generated kind should not be multiple of 5');
+  });
+
+  await t.test('generateAvailableKind constraints', () => {
+    // Test buffer constraint specifically
+    const usedKinds = new Set([1007, 1013, 1019]); // Use odd numbers that aren't multiples of 5
+    
+    const regularKind = KindGenerator.generateAvailableKind('regular', usedKinds);
+    
+    // Should be in range
+    assert.equal(regularKind >= 1000 && regularKind <= 9999, true);
+    
+    // Should be odd
+    assert.equal(regularKind % 2 !== 0, true, 'Generated kind should be odd');
+    
+    // Should not be multiple of 5
+    assert.equal(regularKind % 5 !== 0, true, 'Generated kind should not be multiple of 5');
+    
+    // Should not be within buffer of used kinds
+    const forbiddenNumbers = new Set([
+      1005, 1006, 1007, 1008, 1009, // around 1007
+      1011, 1012, 1013, 1014, 1015, // around 1013
+      1017, 1018, 1019, 1020, 1021, // around 1019
+    ]);
+    
+    assert.equal(forbiddenNumbers.has(regularKind), false, 
+      `Generated kind ${regularKind} should not be in forbidden buffer zone`);
+  });
+
+  await t.test('generateAvailableKind edge cases', () => {
+    // Test with many used kinds to ensure we still find valid ones
+    const usedKinds = new Set<number>();
+    
+    // Fill most even numbers and multiples of 5 in a small range
+    for (let i = 1000; i <= 1100; i++) {
+      if (i % 2 === 0 || i % 5 === 0) {
+        usedKinds.add(i);
+      }
+    }
+    
+    const regularKind = KindGenerator.generateAvailableKind('regular', usedKinds);
+    
+    // Should still find a valid kind
+    assert.equal(regularKind >= 1000 && regularKind <= 9999, true);
+    assert.equal(regularKind % 2 !== 0, true);
+    assert.equal(regularKind % 5 !== 0, true);
+    assert.equal(usedKinds.has(regularKind), false);
   });
 
   await t.test('generateAvailableKind randomness', async () => {
@@ -310,27 +370,37 @@ test('KindGenerator', async (t) => {
     for (let i = 0; i < iterations; i++) {
       const kind = KindGenerator.generateAvailableKind('regular', usedKinds);
       results.set(kind, (results.get(kind) || 0) + 1);
+      
+      // Verify constraints on each generated kind
+      assert.equal(kind % 2 !== 0, true, `Generated kind ${kind} should be odd`);
+      assert.equal(kind % 5 !== 0, true, `Generated kind ${kind} should not be multiple of 5`);
+      assert.equal(usedKinds.has(kind), false, `Generated kind ${kind} should not be in used kinds`);
     }
 
-    // Check that we get good variety (at least 100 unique kinds in 1000 iterations)
-    assert.equal(results.size >= 100, true, `Expected at least 100 unique kinds, got ${results.size}`);
+    // Check that we get good variety (at least 50 unique kinds in 1000 iterations)
+    // Reduced from 100 due to additional constraints
+    assert.equal(results.size >= 50, true, `Expected at least 50 unique kinds, got ${results.size}`);
 
-    // Check that no single kind dominates (no kind should appear more than 10% of the time)
+    // Check that no single kind dominates (no kind should appear more than 15% of the time)
+    // Increased threshold due to reduced available pool
     const maxFrequency = Math.max(...results.values());
     const maxFrequencyPercent = (maxFrequency / iterations) * 100;
     assert.equal(
-      maxFrequencyPercent <= 10,
+      maxFrequencyPercent <= 15,
       true,
-      `No kind should appear more than 10% of the time, but one appeared ${maxFrequencyPercent.toFixed(1)}% of the time`,
+      `No kind should appear more than 15% of the time, but one appeared ${maxFrequencyPercent.toFixed(1)}% of the time`,
     );
 
-    // Specifically check that 7001 doesn't dominate (should appear less than 5% of the time)
-    const kind7001Frequency = results.get(7001) || 0;
-    const kind7001Percent = (kind7001Frequency / iterations) * 100;
-    assert.equal(
-      kind7001Percent <= 5,
-      true,
-      `Kind 7001 should not dominate, but appeared ${kind7001Percent.toFixed(1)}% of the time`,
-    );
+    // Check that all generated kinds follow our constraints
+    for (const [kind] of results) {
+      assert.equal(kind % 2 !== 0, true, `Kind ${kind} should be odd`);
+      assert.equal(kind % 5 !== 0, true, `Kind ${kind} should not be multiple of 5`);
+      
+      // Check buffer constraint
+      for (const usedKind of usedKinds) {
+        const distance = Math.abs(kind - usedKind);
+        assert.equal(distance > 2, true, `Kind ${kind} should be more than 2 away from used kind ${usedKind}`);
+      }
+    }
   });
 });

@@ -106,6 +106,10 @@ test('NostrMcpServer', async (t) => {
         // Should not be one of the used kinds from our mock data
         const usedKinds = [0, 1, 3, 4, 5, 7, 1984];
         assert.equal(usedKinds.includes(generatedKind), false);
+        // Should be odd (new constraint)
+        assert.equal(generatedKind % 2 !== 0, true, `Generated kind ${generatedKind} should be odd`);
+        // Should not be multiple of 5 (new constraint)
+        assert.equal(generatedKind % 5 !== 0, true, `Generated kind ${generatedKind} should not be multiple of 5`);
       }
     }
   });
@@ -130,6 +134,10 @@ test('NostrMcpServer', async (t) => {
         // Should not be one of the used kinds from our mock data
         const usedKinds = [30000, 30001];
         assert.equal(usedKinds.includes(generatedKind), false);
+        // Should be odd (new constraint)
+        assert.equal(generatedKind % 2 !== 0, true, `Generated kind ${generatedKind} should be odd`);
+        // Should not be multiple of 5 (new constraint)
+        assert.equal(generatedKind % 5 !== 0, true, `Generated kind ${generatedKind} should not be multiple of 5`);
       }
     }
   });

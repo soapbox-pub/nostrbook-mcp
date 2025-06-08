@@ -84,22 +84,55 @@ export class KindGenerator {
   ): number {
     const rangeInfo = this.getKindRangeInfo(range);
 
+    // Create a set of all numbers to avoid (used kinds + buffer)
+    const kindsToAvoid = new Set<number>();
+    
+    // Add used kinds and their buffer zones
+    for (const usedKind of usedKinds) {
+      kindsToAvoid.add(usedKind);
+      // Add buffer of 2 kinds on each side
+      kindsToAvoid.add(usedKind - 2);
+      kindsToAvoid.add(usedKind - 1);
+      kindsToAvoid.add(usedKind + 1);
+      kindsToAvoid.add(usedKind + 2);
+    }
+
     // Collect all available numbers in the range
     const availableKinds: number[] = [];
     for (let i = rangeInfo.min; i <= rangeInfo.max; i++) {
-      if (!usedKinds.has(i)) {
-        availableKinds.push(i);
+      // Skip if in range to avoid
+      if (kindsToAvoid.has(i)) {
+        continue;
       }
+      
+      // Skip even numbers
+      if (i % 2 === 0) {
+        continue;
+      }
+      
+      // Skip multiples of 5
+      if (i % 5 === 0) {
+        continue;
+      }
+      
+      availableKinds.push(i);
     }
 
-    // If no available numbers, return the first number in range
+    // If no available numbers, fall back to first valid number in range
     if (availableKinds.length === 0) {
+      for (let i = rangeInfo.min; i <= rangeInfo.max; i++) {
+        // Find first odd number that's not a multiple of 5
+        if (i % 2 !== 0 && i % 5 !== 0) {
+          return i;
+        }
+      }
+      // Ultimate fallback
       return rangeInfo.min;
     }
 
     // Return a random available number
     const randomIndex = Math.floor(Math.random() * availableKinds.length);
-    return availableKinds[randomIndex];
+    return availableKinds[randomIndex]!;
   }
 
   /**

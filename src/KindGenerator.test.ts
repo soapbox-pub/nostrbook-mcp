@@ -298,4 +298,39 @@ test('KindGenerator', async (t) => {
     assert.equal(addressableKind >= 30000 && addressableKind <= 39999, true);
     assert.equal(usedKinds.has(addressableKind), false);
   });
+
+  await t.test('generateAvailableKind randomness', async () => {
+    const nipsIndex = await readFile(join(__dirname, 'fixtures', 'NIPs.md'), 'utf-8');
+    const usedKinds = KindGenerator.extractUsedKinds(nipsIndex);
+
+    // Generate many kinds and check distribution
+    const results = new Map<number, number>();
+    const iterations = 1000;
+
+    for (let i = 0; i < iterations; i++) {
+      const kind = KindGenerator.generateAvailableKind('regular', usedKinds);
+      results.set(kind, (results.get(kind) || 0) + 1);
+    }
+
+    // Check that we get good variety (at least 100 unique kinds in 1000 iterations)
+    assert.equal(results.size >= 100, true, `Expected at least 100 unique kinds, got ${results.size}`);
+
+    // Check that no single kind dominates (no kind should appear more than 10% of the time)
+    const maxFrequency = Math.max(...results.values());
+    const maxFrequencyPercent = (maxFrequency / iterations) * 100;
+    assert.equal(
+      maxFrequencyPercent <= 10,
+      true,
+      `No kind should appear more than 10% of the time, but one appeared ${maxFrequencyPercent.toFixed(1)}% of the time`,
+    );
+
+    // Specifically check that 7001 doesn't dominate (should appear less than 5% of the time)
+    const kind7001Frequency = results.get(7001) || 0;
+    const kind7001Percent = (kind7001Frequency / iterations) * 100;
+    assert.equal(
+      kind7001Percent <= 5,
+      true,
+      `Kind 7001 should not dominate, but appeared ${kind7001Percent.toFixed(1)}% of the time`,
+    );
+  });
 });

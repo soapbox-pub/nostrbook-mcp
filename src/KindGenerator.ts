@@ -84,19 +84,22 @@ export class KindGenerator {
   ): number {
     const rangeInfo = this.getKindRangeInfo(range);
 
-    // Start from a random position in the range to avoid always suggesting the same numbers
-    const rangeSize = rangeInfo.max - rangeInfo.min + 1;
-    const startOffset = Math.floor(Math.random() * rangeSize);
-
-    for (let i = 0; i < rangeSize; i++) {
-      const kind = rangeInfo.min + ((startOffset + i) % rangeSize);
-      if (!usedKinds.has(kind)) {
-        return kind;
+    // Collect all available numbers in the range
+    const availableKinds: number[] = [];
+    for (let i = rangeInfo.min; i <= rangeInfo.max; i++) {
+      if (!usedKinds.has(i)) {
+        availableKinds.push(i);
       }
     }
 
-    // If all numbers in range are used (unlikely), return the first number in range
-    return rangeInfo.min;
+    // If no available numbers, return the first number in range
+    if (availableKinds.length === 0) {
+      return rangeInfo.min;
+    }
+
+    // Return a random available number
+    const randomIndex = Math.floor(Math.random() * availableKinds.length);
+    return availableKinds[randomIndex];
   }
 
   /**

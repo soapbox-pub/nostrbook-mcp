@@ -243,6 +243,8 @@ export class NostrMcpServer extends McpServer {
             }],
             isError: true,
           };
+        } finally {
+          await pool.close();
         }
       },
     );

@@ -52,6 +52,7 @@ test('NostrMcpServer', async (t) => {
 
     const toolNames = result.tools.map((tool) => tool.name);
     assert.equal(toolNames.includes('read_nip'), true);
+    assert.equal(toolNames.includes('fetch_event'), true);
     assert.equal(toolNames.includes('generate_kind'), true);
   });
 

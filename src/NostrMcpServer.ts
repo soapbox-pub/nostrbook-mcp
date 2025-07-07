@@ -1,5 +1,5 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { NRelay1 } from '@nostrify/nostrify';
+import { NPool, NRelay1, type NostrEvent, type NostrFilter } from '@nostrify/nostrify';
 import { nip19 } from 'nostr-tools';
 import { z } from 'zod';
 
@@ -70,11 +70,11 @@ export class NostrMcpServer extends McpServer {
     );
 
     this.tool(
-      'read_custom_nip',
-      'Read a Nostr community NIP document',
+      'fetch_event',
+      'Fetch a Nostr event using a nip19 identifier',
       {
-        naddr: z
-          .custom<`naddr1${string}`>()
+        identifier: z
+          .string()
           .superRefine((val, ctx) => {
             let decoded: nip19.DecodedResult;
             try {
@@ -83,56 +83,167 @@ export class NostrMcpServer extends McpServer {
               ctx.addIssue({
                 code: 'custom',
                 message:
-                  `Failed to decode Nostr address. Invalid NIP-19 identifier: ${val}`,
+                  `Failed to decode identifier. Invalid NIP-19 identifier: ${val}`,
               });
               return;
             }
-            if (decoded.type !== 'naddr') {
+            
+            // Reject nsec for security reasons
+            if (decoded.type === 'nsec') {
               ctx.addIssue({
                 code: 'custom',
                 message:
-                  'Wrong Nostr identifier type. Nostr address must start with `naddr1`',
+                  'nsec identifiers are not supported for security reasons',
               });
               return;
             }
-            if (decoded.data.kind !== 30817) {
+            
+            // Accept npub, nprofile, naddr, note, nevent
+            if (!['npub', 'nprofile', 'naddr', 'note', 'nevent'].includes(decoded.type)) {
               ctx.addIssue({
                 code: 'custom',
                 message:
-                  `The provided Nostr address does not represent a NIP document. Expected kind 30817, got ${decoded.data.kind}`,
+                  `Unsupported identifier type: ${decoded.type}. Supported types: npub, nprofile, naddr, note, nevent`,
               });
               return;
             }
           })
           .describe(
-            'Nostr address starting with `naddr1`, e.g. `naddr1qvzqqqrcvypzqprpljlvcnpnw3pejvkkhrc3y6wvmd7vjuad0fg2ud3dky66gaxaqqxku6tswvkk7m3ddehhxarjqk4nmy`',
+            'NIP-19 identifier (npub, nprofile, naddr, note, or nevent), e.g. npub1... or naddr1...',
           ),
       },
-      async ({ naddr }) => {
-        const { data: addr } = nip19.decode(naddr);
-        const relay = new NRelay1(addr.relays?.[0] ?? 'wss://ditto.pub/relay');
+      async ({ identifier }) => {
+        const decoded = nip19.decode(identifier);
 
-        const [event] = await relay.query(
-          [{
-            kinds: [addr.kind],
-            authors: [addr.pubkey],
-            '#d': [addr.identifier],
-          }],
-          { signal: AbortSignal.timeout(8_000) },
-        );
+        const defaultRelays = [
+          'wss://ditto.pub/relay',
+          'wss://relay.nostr.band',
+          'wss://relay.primal.net',
+        ];
 
-        if (!event) {
+        const pool = new NPool({
+          open(url) {
+            return new NRelay1(url);
+          },
+          eventRouter() {
+            return [...defaultRelays];
+          },
+          reqRouter(filters) {
+            return new Map(
+              [...defaultRelays].map((url) => [url, filters]),
+            );
+          },
+        });
+
+        try {
+          let event: NostrEvent | undefined;
+
+          switch (decoded.type) {
+            case 'npub': {
+              // For npub, fetch the user's kind 0 (profile) event
+              [event] = await pool.query(
+                [{
+                  kinds: [0],
+                  authors: [decoded.data],
+                  limit: 1,
+                }],
+                { signal: AbortSignal.timeout(8_000) },
+              );
+              break;
+            }
+
+            case 'nprofile': {
+              // For nprofile, fetch the user's kind 0 (profile) event
+              const { relays = defaultRelays } = decoded.data;
+              [event] = await pool.group(relays).query(
+                [{
+                  kinds: [0],
+                  authors: [decoded.data.pubkey],
+                  limit: 1,
+                }],
+                { signal: AbortSignal.timeout(8_000) },
+              );
+              break;
+            }
+
+            case 'note': {
+              // For note, fetch the specific event by ID
+              [event] = await pool.query(
+                [{ ids: [decoded.data] }],
+                { signal: AbortSignal.timeout(8_000) },
+              );
+              break;
+            }
+
+            case 'nevent': {
+              // For nevent, fetch the specific event by ID
+              const { relays = defaultRelays } = decoded.data;
+              [event] = await pool.group(relays).query(
+                [{
+                  ids: [decoded.data.id],
+                }],
+                { signal: AbortSignal.timeout(8_000) },
+              );
+              break;
+            }
+
+            case 'naddr': {
+              // For naddr, fetch by kind, pubkey, and d tag
+              const { relays = defaultRelays } = decoded.data;
+              [event] = await pool.group(relays).query(
+                [{
+                  kinds: [decoded.data.kind],
+                  authors: [decoded.data.pubkey],
+                  '#d': [decoded.data.identifier],
+                }],
+                { signal: AbortSignal.timeout(8_000) },
+              );
+              break;
+            }
+
+            default:
+              return {
+                content: [{
+                  type: 'text',
+                  text: `Unsupported identifier type: ${decoded.type}`,
+                }],
+                isError: true,
+              };
+          }
+
+          if (!event) {
+            return {
+              content: [{
+                type: 'text',
+                text: 'No event found for the provided identifier. Make sure it exists and is accessible.',
+              }],
+              isError: true,
+            };
+          }
+
+          // Special handling for specific kinds
+          if (event.kind === 30817) {
+            // Kind 30817 is a NIP document, return just the content
+            return { content: [{ type: 'text', text: event.content }] };
+          }
+          
+          // For other kinds, return the full event JSON
+          return { 
+            content: [{ 
+              type: 'text', 
+              text: JSON.stringify(event, null, 2) 
+            }] 
+          };
+          
+        } catch (error) {
           return {
             content: [{
               type: 'text',
-              text:
-                'No event found for the provided Nostr address. Make sure it exists and is accessible.',
-              isError: true,
+              text: `Error fetching event: ${error instanceof Error ? error.message : 'Unknown error'}`,
             }],
+            isError: true,
           };
         }
-
-        return { content: [{ type: 'text', text: event.content }] };
       },
     );
 

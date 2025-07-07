@@ -7,6 +7,7 @@ This is an [MCP](https://modelcontextprotocol.io/) implementation that allows AI
 When enabled, agents will gain access to the following tools.
 
 - **read_nip(nip)**: Fetches and reads a NIP in markdown from the official Nostr NIPs repository
+- **fetch_event(identifier)**: Fetches a Nostr event using a nip19 identifier (npub, nprofile, naddr, note, nevent). For npub/nprofile, returns the user's profile (kind 0). For naddr, returns the addressable event. Special handling for kind 30817 (NIP documents) returns just the content, while other kinds return the full event JSON.
 - **read_kind(kind)**: Fetches and reads a kind doc from nostrbook.dev
 - **read_tag(tag)**: Fetches and reads a tag doc from nostrbook.dev
 - **read_protocol(doc)**: Fetches and reads a a protocol doc ("event", "filter", "client", "relay", etc) from nostrbook.dev

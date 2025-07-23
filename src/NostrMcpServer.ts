@@ -154,7 +154,12 @@ export class NostrMcpServer extends McpServer {
 
             case 'nprofile': {
               // For nprofile, fetch the user's kind 0 (profile) event
-              const { relays = defaultRelays } = decoded.data;
+              let { relays } = decoded.data;
+
+              if (!relays || !relays.length) {
+                relays = defaultRelays;
+              }
+
               [event] = await pool.group(relays).query(
                 [{
                   kinds: [0],
@@ -177,7 +182,12 @@ export class NostrMcpServer extends McpServer {
 
             case 'nevent': {
               // For nevent, fetch the specific event by ID
-              const { relays = defaultRelays } = decoded.data;
+              let { relays } = decoded.data;
+
+              if (!relays || !relays.length) {
+                relays = defaultRelays;
+              }
+
               [event] = await pool.group(relays).query(
                 [{
                   ids: [decoded.data.id],
@@ -189,7 +199,12 @@ export class NostrMcpServer extends McpServer {
 
             case 'naddr': {
               // For naddr, fetch by kind, pubkey, and d tag
-              const { relays = defaultRelays } = decoded.data;
+              let { relays } = decoded.data;
+
+              if (!relays || !relays.length) {
+                relays = defaultRelays;
+              }
+
               [event] = await pool.group(relays).query(
                 [{
                   kinds: [decoded.data.kind],

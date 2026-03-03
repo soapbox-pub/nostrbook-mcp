@@ -116,9 +116,10 @@ export class NostrMcpServer extends McpServer {
         const decoded = nip19.decode(identifier);
 
         const defaultRelays = [
-          'wss://ditto.pub/relay',
-          'wss://relay.nostr.band',
+          'wss://relay.ditto.pub',
           'wss://relay.primal.net',
+          'wss://relay.damus.io',
+          'wss://nos.lol',
         ];
 
         const pool = new NPool({

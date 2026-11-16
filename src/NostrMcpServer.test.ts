@@ -35,6 +35,7 @@ test('NostrMcpServer', async (t) => {
     name: 'test client',
     version: '1.0',
   });
+  t.after(async () => { await client.close(); await server.close(); });
 
   const [clientTransport, serverTransport] = InMemoryTransport
     .createLinkedPair();
@@ -98,6 +99,9 @@ test('NostrMcpServer', async (t) => {
 
     // The result should contain a kind number between 1000-9999 that's not in our mock data
     const content = result.content?.[0];
+    assert.equal(result.isError, undefined);
+    assert.ok(content?.type === 'text');
+    assert.match(content.text, /Generated unused kind: \d+/);
     if (content?.type === 'text') {
       const kindMatch = content.text.match(/Generated unused kind: (\d+)/);
       if (kindMatch && kindMatch[1]) {
@@ -126,6 +130,9 @@ test('NostrMcpServer', async (t) => {
 
     // The result should contain a kind number between 30000-39999 that's not in our mock data
     const content = result.content?.[0];
+    assert.equal(result.isError, undefined);
+    assert.ok(content?.type === 'text');
+    assert.match(content.text, /Generated unused kind: \d+/);
     if (content?.type === 'text') {
       const kindMatch = content.text.match(/Generated unused kind: (\d+)/);
       if (kindMatch && kindMatch[1]) {

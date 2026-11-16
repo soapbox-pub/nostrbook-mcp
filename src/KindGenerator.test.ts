@@ -9,6 +9,22 @@ import { KindGenerator } from './KindGenerator.ts';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+test('exhausted kind ranges never return occupied kinds', () => {
+  const used = new Set(Array.from({ length: 9000 }, (_, i) => i + 1000));
+  assert.throws(() => KindGenerator.generateAvailableKind('regular', used), /No available kind/);
+});
+
+test('abbreviated multi-digit kind ranges', () => {
+  const used = KindGenerator.extractUsedKinds('| `39000-99` | range |');
+  assert.equal(used.size, 100);
+  assert.equal(used.has(39099), true);
+});
+
+test('kind parsing stays within the event kinds table and accepts spaced ranges', () => {
+  const used = KindGenerator.extractUsedKinds('## NIPs\n| `99` | NIP |\n## Event Kinds\n| `5000` – `5002` | range |\n## Tags\n| `42` | tag |');
+  assert.deepEqual([...used], [5000, 5001, 5002]);
+});
+
 test('KindGenerator', async (t) => {
   await t.test('extractUsedKinds with real NIPs fixture', async () => {
     const nipsIndex = await readFile(join(__dirname, 'fixtures', 'NIPs.md'), 'utf-8');

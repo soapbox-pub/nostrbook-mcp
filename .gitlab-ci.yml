@@ -1,4 +1,4 @@
-image: node:24
+image: node:${NODE_VERSION}
 
 default:
   interruptible: true
@@ -7,10 +7,11 @@ stages:
   - test
 
 test:
+  parallel:
+    matrix:
+      - NODE_VERSION: ['24', '26']
   stage: test
   timeout: 2 minutes
   script:
-    - npm i
-    - npm run check
-    - npm run test
-    - npm run build
+    - npm ci
+    - npm run verify

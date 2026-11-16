@@ -6,6 +6,7 @@ export interface NIPsClientOpts {
   urlTemplate: string;
   /** Optional fetch function override */
   fetch?: typeof fetch;
+  timeoutMs?: number;
 }
 
 /** Client for fetching NIPs (Nostr Implementation Possibilities) documentation */
@@ -15,17 +16,19 @@ export class NIPsClient {
 
   /** The fetch implementation to use for requests */
   private fetch: typeof fetch;
+  private timeoutMs: number;
 
   constructor(opts: NIPsClientOpts) {
     this.urlTemplate = opts.urlTemplate;
     this.fetch = opts.fetch ?? globalThis.fetch;
+    this.timeoutMs = opts.timeoutMs ?? 10_000;
   }
 
   /** Reads a documentation file by its slug */
   async readDoc(slug: string): Promise<string> {
     const url = this.urlTemplate.replace('{nip}', slug);
 
-    const request = new Request(url);
+    const request = new Request(url, { signal: AbortSignal.timeout(this.timeoutMs) });
     const response = await this.fetch(request);
 
     if (!response.ok) {

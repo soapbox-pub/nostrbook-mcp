@@ -20,6 +20,8 @@ export class KindGenerator {
    */
   static extractUsedKinds(nipsIndex: string): Set<number> {
     const usedKinds = new Set<number>();
+    const section = nipsIndex.split(/^## Event Kinds\s*$/mi)[1]?.split(/^## /m)[0];
+    if (section !== undefined) nipsIndex = section;
 
     // Look for kind numbers in the Event Kinds table
     // Format: | `1234` | description | NIP |
@@ -29,9 +31,9 @@ export class KindGenerator {
       // Single kind in backticks: `1234`
       /\|\s*`(\d+)`\s*\|/g,
       // Range in backticks: `5000`-`5999`
-      /\|\s*`(\d+)`-`(\d+)`\s*\|/g,
+      /\|\s*`(\d+)`\s*[-–]\s*`(\d+)`\s*\|/g,
       // Range in backticks with single digit end: `39000-9`
-      /\|\s*`(\d+)-(\d+)`\s*\|/g,
+      /\|\s*`(\d+)\s*[-–]\s*(\d+)`\s*\|/g,
     ];
 
     for (const pattern of kindPatterns) {
@@ -43,7 +45,7 @@ export class KindGenerator {
           let end = parseInt(match[2], 10);
 
           // Handle special case like `39000-9` which means 39000-39009
-          if (end < start && end < 10) {
+          if (end < start && match[2].length < match[1].length) {
             const startStr = match[1];
             const endStr = match[2];
             if (startStr && endStr) {
@@ -118,16 +120,9 @@ export class KindGenerator {
       availableKinds.push(i);
     }
 
-    // If no available numbers, fall back to first valid number in range
+    // Never return an occupied kind when the candidate range is exhausted.
     if (availableKinds.length === 0) {
-      for (let i = rangeInfo.min; i <= rangeInfo.max; i++) {
-        // Find first odd number that's not a multiple of 5
-        if (i % 2 !== 0 && i % 5 !== 0) {
-          return i;
-        }
-      }
-      // Ultimate fallback
-      return rangeInfo.min;
+      throw new Error(`No available kind in the ${range} range under the selection constraints`);
     }
 
     // Return a random available number

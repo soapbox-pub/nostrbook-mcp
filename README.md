@@ -8,6 +8,7 @@ When enabled, agents will gain access to the following tools.
 
 - **read_nip(nip)**: Fetches and reads a NIP in markdown from the official Nostr NIPs repository
 - **fetch_event(identifier)**: Fetches a Nostr event using a nip19 identifier (npub, nprofile, naddr, note, nevent). For npub/nprofile, returns the user's profile (kind 0). For naddr, returns the addressable event. Special handling for kind 30817 (NIP documents) returns just the content, while other kinds return the full event JSON.
+- **search_community_nips(query?, limit?, kind?, author?)**: Discovers NostrHub community NIPs (kind 30817) on Ditto and Dreamith. Omit `query` to browse recent documents, or supply keywords for NIP-50 search. Optionally filter by documented event `kind` or author hex public key. Returns up to 100 results (default 20) with titles, author, documented kinds, previews, NostrHub links, and relay-hinted `naddr` identifiers for `fetch_event`. Results are deduplicated by author and identifier; coverage depends on the relays, and community documents are not official NIPs.
 - **read_kind(kind)**: Fetches and reads a kind doc from nostrbook.dev
 - **read_tag(tag)**: Fetches and reads a tag doc from nostrbook.dev
 - **read_protocol(doc)**: Fetches and reads a a protocol doc ("event", "filter", "client", "relay", etc) from nostrbook.dev
@@ -77,6 +78,7 @@ after installing dependencies and building. Restart the client after rebuilding.
 - Event lookups try valid relay hints first, then the default relay set if hints fail
   or return nothing. Each attempt is bounded to 8 seconds (up to 16 seconds with fallback).
 - Profile/addressable lookups choose the newest returned event; ties use the lowest event ID.
+- Relay cleanup waits at most 500 ms so a missing WebSocket close event cannot block a tool result. Community discovery has an 8-second query timeout and may return partial results.
 - Missing documents, network failures, and missing events return MCP tool errors.
   Check the client logs, run `npm run test:live`, and verify Node with `node --version`.
 - `nsec` inputs are rejected. Event fetching only reads public events.

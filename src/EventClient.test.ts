@@ -78,3 +78,55 @@ test('no result and unsupported private keys', async () => {
   assert.equal(await client.fetch(nip19.npubEncode(pubkey)), undefined);
   await assert.rejects(client.fetch(nip19.nsecEncode(new Uint8Array(32).fill(1))), /Unsupported/);
 });
+
+test('stalled or rejected cleanup cannot hide results or query errors', { timeout: 1000 }, async () => {
+  for (const failQuery of [false, true]) {
+    for (const failClose of [false, true]) {
+      const client = new EventClient({ cleanupTimeoutMs: 10, createPool: () => ({
+        async query() { if (failQuery) throw new Error('query failed'); return [event]; },
+        async close() { if (failClose) throw new Error('close failed'); await new Promise(() => {}); },
+      }) });
+      const result = client.fetch(nip19.noteEncode(event.id));
+      if (failQuery) await assert.rejects(result, /query failed/);
+      else assert.equal(await result, event);
+    }
+  }
+});
+
+test('community discovery validates, deduplicates, filters and returns fetchable pointers', async () => {
+  const old = { ...event, kind: 30817, tags: [['d', 'test'], ['title', 'Test'], ['k', '1234']], content: 'a'.repeat(600) };
+  const newer = { ...old, created_at: 20, id: 'd'.repeat(64) };
+  const other = { ...old, pubkey: 'e'.repeat(64), created_at: 30 };
+  const client = new EventClient({ cleanupTimeoutMs: 10, createPool: () => ({
+    async query(filters, { relays }) {
+      assert.deepEqual(relays, ['wss://relay.ditto.pub', 'wss://relay.dreamith.to']);
+      assert.deepEqual(filters, [{ kinds: [30817], limit: 2, search: 'Test', '#k': ['1234'], authors: [pubkey] }]);
+      return [old, newer, { ...old, tags: [] }, other, event];
+    },
+    async close() { await new Promise(() => {}); },
+  }) });
+  const results = await client.searchCommunityNips({ query: ' Test ', limit: 2, kind: 1234, author: pubkey });
+  assert.equal(results.length, 2);
+  assert.equal(results[0]?.eventId, newer.id);
+  assert.equal(results[0]?.preview.length, 500);
+  assert.deepEqual(results[0]?.kinds, ['1234']);
+  assert.deepEqual(nip19.decode(results[0]!.naddr), { type: 'naddr', data: {
+    kind: 30817, pubkey, identifier: 'test', relays: ['wss://relay.ditto.pub', 'wss://relay.dreamith.to'],
+  } });
+});
+
+test('recent community discovery sorts newest first; cancellation closes the pool', async () => {
+  let closed = 0;
+  const controller = new AbortController();
+  const client = new EventClient({ createPool: () => ({
+    async query(filters) {
+      assert.deepEqual(filters, [{ kinds: [30817], limit: 20 }]);
+      return [10, 30].map((created_at) => ({ ...event, kind: 30817, created_at, tags: [['d', String(created_at)], ['title', 'Test']] }));
+    },
+    async close() { closed++; },
+  }) });
+  assert.deepEqual((await client.searchCommunityNips({})).map((r) => r.createdAt), [30, 10]);
+  controller.abort(new Error('cancelled'));
+  await assert.rejects(client.searchCommunityNips({}, controller.signal), /cancelled/);
+  assert.equal(closed, 2);
+});

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "servers": {
+      "nostrbook": {
+        "type": "local",
+        "command": ["node", "src/stdio.ts"],
+        "cwd": "."
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # Nostr MCP Project
 
-This Node.js 24+ TypeScript stdio server exposes seven tools for reading Nostr
+This Node.js 24+ TypeScript stdio server exposes eight tools for reading Nostr
 documentation, fetching public events, and suggesting event kinds.
 
 ## Components
@@ -29,8 +29,8 @@ CI uses Node 24 and 26. There is no lint script.
 
 ## Compatibility
 
-Keep the seven public tool names stable: `read_nip`, `fetch_event`, `read_kind`,
-`read_tag`, `read_protocol`, `read_nips_index`, `generate_kind`.
+Keep the public tool names stable: `read_nip`, `fetch_event`, `read_kind`,
+`read_tag`, `read_protocol`, `read_nips_index`, `generate_kind`, `search_community_nips`.
 Kind 30817 returns content only; other fetched events return JSON text.
 Kind suggestions are checked against the fetched NIPs index, not a global registry.
 Never log diagnostics to stdout: it carries the MCP protocol.

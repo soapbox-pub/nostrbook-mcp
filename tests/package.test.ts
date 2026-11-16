@@ -37,7 +37,7 @@ test('packed production install initializes, calls tools over stdio, and shuts d
   const client = new Client({ name: 'package-test', version: '1' });
   t.after(() => client.close());
   await client.connect(transport);
-  assert.equal((await client.listTools()).tools.length, 7);
+  assert.equal((await client.listTools()).tools.length, 8);
   assert.deepEqual((await client.callTool({ name: 'read_nip', arguments: { nip: '01' } })).content,
     [{ type: 'text', text: 'NIP-01 fixture over real HTTP' }]);
   assert.equal((await client.callTool({ name: 'read_nip', arguments: { nip: 'FF' } })).isError, true);

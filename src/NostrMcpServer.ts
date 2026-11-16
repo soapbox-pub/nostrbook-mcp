@@ -14,7 +14,7 @@ interface NostrMcpServerOpts {
   fetch?: typeof fetch;
   nostrbookBaseUrl?: string;
   nipsUrlTemplate?: string;
-  events?: Pick<EventClient, 'fetch'>;
+  events?: Pick<EventClient, 'fetch'> & Partial<Pick<EventClient, 'searchCommunityNips'>>;
   timeoutMs?: number;
 }
 
@@ -45,6 +45,20 @@ export class NostrMcpServer extends McpServer {
     });
     const events = opts.events ?? new EventClient();
     const annotations = { readOnlyHint: true, openWorldHint: true };
+
+    this.registerTool('search_community_nips', {
+      description: 'Discover NostrHub community NIPs. Search keywords, or omit query for recent documents. Returns previews and naddr identifiers to read with fetch_event. Results depend on relay coverage and are not official NIP endorsements.',
+      annotations,
+      inputSchema: {
+        query: z.string().trim().min(1).max(500).optional(),
+        limit: z.number().int().min(1).max(100).default(20),
+        kind: z.number().int().min(0).max(65535).optional().describe('Event kind documented by the community NIP'),
+        author: z.string().regex(/^[0-9a-f]{64}$/).optional().describe('Author public key in hex'),
+      },
+    }, (args, extra) => readText(async () => {
+      const client = events.searchCommunityNips ? events : new EventClient();
+      return JSON.stringify(await client.searchCommunityNips!(args, extra.signal), null, 2);
+    }));
 
     this.registerTool('read_nip', {
       description: 'Read a Nostr NIP document', annotations,

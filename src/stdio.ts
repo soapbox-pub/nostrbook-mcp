@@ -6,6 +6,8 @@ import packageJson from '../package.json' with { type: 'json' };
 const server = new NostrMcpServer({
   name: packageJson.name,
   version: packageJson.version,
+  nostrbookBaseUrl: process.env.NOSTRBOOK_BASE_URL,
+  nipsUrlTemplate: process.env.NIPS_URL_TEMPLATE,
 });
 
 const transport = new StdioServerTransport();

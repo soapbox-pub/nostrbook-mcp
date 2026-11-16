@@ -7,6 +7,8 @@ await esbuild.build({
   outfile: 'dist/mcp',
   platform: 'node',
   format: 'esm',
+  target: 'node24',
+  packages: 'external',
   banner: {
     js: '#!/usr/bin/env node',
   },

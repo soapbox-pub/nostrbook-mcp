@@ -1,57 +1,38 @@
 # Nostr MCP Project
 
-## Project Overview
+This Node.js 24+ TypeScript stdio server exposes seven tools for reading Nostr
+documentation, fetching public events, and suggesting event kinds.
 
-Nostr MCP (Model Context Protocol) is an extension for AI assistants that provides up-to-date information about the Nostr protocol. It acts as a bridge between AI assistants and the Nostr protocol documentation, allowing them to access current information even if their training data is outdated.
+## Components
 
-## Key Components
+- `src/NostrMcpServer.ts`: MCP tool registration, schemas, and tool error responses.
+- `src/EventClient.ts`: NIP-19 decoding, relay hint fallback, bounded queries, newest-event selection, and pool cleanup.
+- `src/NIPsClient.ts`: official NIP Markdown and index fetching, with HTTP timeouts.
+- `src/NostrbookClient.ts`: kind, tag, and protocol Markdown fetching, with HTTP timeouts.
+- `src/KindGenerator.ts`: index table parsing and collision-avoiding kind suggestions.
+- `src/stdio.ts`: stdio entry point and documentation source environment overrides.
+- `scripts/build.ts`: bundles project code into `dist/mcp`; npm runtime dependencies remain external.
 
-- **NostrMcpServer**: Main server class that implements the MCP protocol and defines the available tools
-- **NIPsClient**: Client for fetching NIPs (Nostr Implementation Possibilities) from the official GitHub repository
-- **NostrbookClient**: Client for fetching documentation from Nostrbook.dev
-- **stdio.ts**: Entry point for the MCP server that handles stdio communication
+## Commands
 
-## Available Tools
+- `npm ci`: install the lockfile.
+- `npm run check`: type check.
+- `npm test`: unit and in-memory MCP tool tests.
+- `npm run test:integration`: build, packed production install/stdio test, local WebSocket relay tests.
+- `npm run verify`: all of the above checks and tests.
+- `npm run test:live`: public documentation smoke tests; set `NOSTR_SMOKE_IDENTIFIER` to also test a public relay lookup.
+- `npm run dev`: run the source stdio server.
 
-The MCP exposes the following tools to AI assistants:
+Tests use Node's built-in test runner. Keep public network smoke tests separate
+from deterministic tool/relay tests. The packed-install test may access npm.
+CI uses Node 24 and 26. There is no lint script.
 
-1. **read_nip**: Reads a specific NIP document
-   - Parameter: `nip` (2-digit hex string)
+## Compatibility
 
-2. **read_kind**: Reads documentation about a specific event kind
-   - Parameter: `kind` (number)
+Keep the seven public tool names stable: `read_nip`, `fetch_event`, `read_kind`,
+`read_tag`, `read_protocol`, `read_nips_index`, `generate_kind`.
+Kind 30817 returns content only; other fetched events return JSON text.
+Kind suggestions are checked against the fetched NIPs index, not a global registry.
+Never log diagnostics to stdout: it carries the MCP protocol.
 
-3. **read_tag**: Reads documentation about a specific Nostr tag
-   - Parameter: `tag` (string)
-
-4. **read_protocol**: Reads general protocol documentation
-   - Parameter: `doc` (enum: "index", "event", "filter", "client", "relay")
-
-5. **read_nips_index**: Reads the NIPs index which lists all NIPs
-   - No parameters required
-
-## Development Workflow
-
-- **Run tests**: `npm run test`
-- **Type checking**: `npm run check`
-- **Lint code**: `npm run lint`
-
-## Dependencies
-
-- **Node**: The JavaScript/TypeScript runtime
-- **@modelcontextprotocol/sdk**: SDK for building MCPs
-- **Zod**: TypeScript-first schema validation
-
-## External Services
-
-- **Nostr NIPs GitHub repository**: https://github.com/nostr-protocol/nips
-- **Nostrbook**: https://nostrbook.dev
-
-## File Structure
-
-- **src/NostrMcpServer.ts**: Main implementation of the MCP server
-- **src/NIPsClient.ts**: Client for fetching NIPs documentation
-- **src/NostrbookClient.ts**: Client for fetching Nostrbook documentation
-- **src/HTTPError.ts**: Error handling for HTTP requests
-- **src/llmstxt.ts**: Utilities for handling AI-readable text formats
-- **src/stdio.ts**: Entry point for the MCP server
+See README.md for client configuration and environment variables.

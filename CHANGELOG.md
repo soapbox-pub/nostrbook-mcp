@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 - 2026-11-16
 
 - Fix event lookups hanging during relay shutdown by bounding cleanup waits.
 - Add `search_community_nips` for NostrHub keyword search and recent-document discovery, with kind/author filters and relay-hinted references.

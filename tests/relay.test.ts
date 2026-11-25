@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
+import { createServer, type Socket } from 'node:net';
 import { WebSocketServer } from 'ws';
 import { finalizeEvent, nip19 } from 'nostr-tools';
 import { EventClient } from '../src/EventClient.ts';
@@ -45,4 +46,19 @@ test('silent relay times out and is disconnected', { timeout: 10_000 }, async (t
   await assert.rejects(client.fetch(nip19.noteEncode('a'.repeat(64))), /timed out|aborted/i);
   await closed;
   assert.equal(relay.clients.size, 0);
+});
+
+test('relay that never completes the WebSocket handshake cannot hang a lookup', { timeout: 10_000 }, async (t) => {
+  // Accepts TCP but never answers, so the socket never opens or emits close.
+  const sockets = new Set<Socket>();
+  const server = createServer((socket) => { sockets.add(socket); socket.on('error', () => {}); });
+  server.listen(0, '127.0.0.1');
+  await once(server, 'listening');
+  t.after(() => { for (const socket of sockets) socket.destroy(); server.close(); });
+  const address = server.address();
+  assert.ok(address && typeof address !== 'string');
+  const client = new EventClient({ relays: [`ws://127.0.0.1:${address.port}`], timeoutMs: 150, cleanupTimeoutMs: 100 });
+  const started = Date.now();
+  await assert.rejects(client.fetch(nip19.noteEncode('a'.repeat(64))), /timed out|aborted/i);
+  assert.ok(Date.now() - started < 2_000);
 });
